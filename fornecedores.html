@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Fornecedores</title>
+
+  <link rel="stylesheet" href="css/style.css">
+
+  <style>
+
+    .topo{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:30px;
+      gap:20px;
+      flex-wrap:wrap;
+    }
+
+    .cards-fornecedores{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+      gap:25px;
+      margin-top:40px;
+    }
+
+    .fornecedor-card{
+      background:#141414;
+      border-radius:24px;
+      padding:28px;
+      border:1px solid rgba(255,255,255,.06);
+      transition:.3s;
+    }
+
+    .fornecedor-card:hover{
+      transform:translateY(-6px);
+      border-color:rgba(255,152,0,.25);
+    }
+
+    .fornecedor-card h3{
+      font-size:28px;
+      margin-bottom:10px;
+    }
+
+    .fornecedor-card p{
+      color:#bcbcbc;
+      margin-bottom:12px;
+    }
+
+    .valor-gasto{
+      color:#ff9800;
+      font-size:28px;
+      font-weight:800;
+      margin-top:20px;
+    }
+
+    .acoes{
+      display:flex;
+      gap:10px;
+      margin-top:20px;
+    }
+
+    .btn-remover{
+      background:#b91c1c;
+      border:none;
+      color:#fff;
+      padding:12px 18px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:600;
+    }
+
+    .grid-form{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+      gap:20px;
+    }
+
+  </style>
+
+</head>
+<body>
+
+<div class="admin-layout">
+
+  <aside>
+
+    <h2>Burger Admin</h2>
+
+    <a href="admin.html">Dashboard</a>
+    <a href="pedidos.html">Pedidos</a>
+    <a href="produtos.html">Produtos</a>
+    <a href="estoque.html">Estoque</a>
+    <a href="fornecedores.html">Fornecedores</a>
+
+  </aside>
+
+  <main>
+
+    <div class="topo">
+
+      <div>
+        <h1>Fornecedores</h1>
+        <p style="color:#aaa;">
+          Controle de gastos e compras
+        </p>
+      </div>
+
+    </div>
+
+    <form id="formFornecedor">
+
+      <h2 style="margin-bottom:25px;">
+        Novo Fornecedor
+      </h2>
+
+      <div class="grid-form">
+
+        <input
+          type="text"
+          id="nomeFornecedor"
+          placeholder="Nome fornecedor"
+          required
+        >
+
+        <input
+          type="text"
+          id="telefoneFornecedor"
+          placeholder="Telefone"
+        >
+
+        <input
+          type="number"
+          id="valorFornecedor"
+          placeholder="Valor gasto"
+          required
+        >
+
+        <input
+          type="text"
+          id="descricaoFornecedor"
+          placeholder="Descrição da compra"
+        >
+
+      </div>
+
+      <button class="btn" type="submit">
+        Salvar Fornecedor
+      </button>
+
+    </form>
+
+    <div class="cards-fornecedores" id="listaFornecedores">
+
+    </div>
+
+  </main>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+<script src="js/supabase.js"></script>
+<script src="js/app.js"></script>
+<script src="js/auth.js"></script>
+
+<script>
+
+const listaFornecedores =
+  document.getElementById('listaFornecedores');
+
+const formFornecedor =
+  document.getElementById('formFornecedor');
+
+/* ==============================
+   CARREGAR FORNECEDORES
+============================== */
+
+async function carregarFornecedores() {
+
+  const { data, error } = await supabaseClient
+    .from('fornecedores')
+    .select(`
+      *,
+      compras_fornecedor (
+        valor,
+        descricao
+      )
+    `);
+
+  if(error) {
+    console.error(error);
+    return;
+  }
+
+  listaFornecedores.innerHTML = '';
+
+  data.forEach(fornecedor => {
+
+    let total = 0;
+
+    fornecedor.compras_fornecedor?.forEach(compra => {
+      total += Number(compra.valor);
+    });
+
+    listaFornecedores.innerHTML += `
+    
+      <div class="fornecedor-card">
+
+        <h3>${fornecedor.nome}</h3>
+
+        <p>
+          📞 ${fornecedor.telefone || 'Não informado'}
+        </p>
+
+        <div class="valor-gasto">
+          R$ ${total.toFixed(2)}
+        </div>
+
+        <p style="margin-top:10px;">
+          Total gasto com fornecedor
+        </p>
+
+        <div class="acoes">
+
+          <button
+            class="btn-remover"
+            onclick="removerFornecedor(${fornecedor.id})"
+          >
+            Excluir
+          </button>
+
+        </div>
+
+      </div>
+
+    `;
+
+  });
+
+}
+
+/* ==============================
+   CADASTRAR
+============================== */
+
+formFornecedor.addEventListener('submit', async (e) => {
+
+  e.preventDefault();
+
+  const nome =
+    document.getElementById('nomeFornecedor').value;
+
+  const telefone =
+    document.getElementById('telefoneFornecedor').value;
+
+  const valor =
+    document.getElementById('valorFornecedor').value;
+
+  const descricao =
+    document.getElementById('descricaoFornecedor').value;
+
+  const { data: fornecedor } = await supabaseClient
+    .from('fornecedores')
+    .insert([
+      {
+        nome,
+        telefone
+      }
+    ])
+    .select()
+    .single();
+
+  await supabaseClient
+    .from('compras_fornecedor')
+    .insert([
+      {
+        fornecedor_id: fornecedor.id,
+        valor,
+        descricao
+      }
+    ]);
+
+  mostrarToast('Fornecedor salvo');
+
+  formFornecedor.reset();
+
+  carregarFornecedores();
+
+});
+
+/* ==============================
+   REMOVER
+============================== */
+
+async function removerFornecedor(id) {
+
+  const confirmar = confirm(
+    'Deseja excluir este fornecedor?'
+  );
+
+  if(!confirmar) return;
+
+  await supabaseClient
+    .from('fornecedores')
+    .delete()
+    .eq('id', id);
+
+  mostrarToast('Fornecedor removido');
+
+  carregarFornecedores();
+
+}
+
+/* ==============================
+   TOAST
+============================== */
+
+function mostrarToast(texto) {
+
+  const toast = document.createElement('div');
+
+  toast.classList.add('toast');
+
+  toast.innerText = texto;
+
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.add('show');
+  }, 100);
+
+  setTimeout(() => {
+
+    toast.classList.remove('show');
+
+    setTimeout(() => {
+      toast.remove();
+    }, 300);
+
+  }, 2500);
+
+}
+
+carregarFornecedores();
+
+</script>
+
+</body>
+</html>

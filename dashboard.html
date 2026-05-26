@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Dashboard | Burger Admin</title>
+
+  <link rel="stylesheet" href="css/style.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+
+    .topo-dashboard{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:20px;
+      margin-bottom:35px;
+      flex-wrap:wrap;
+    }
+
+    .filtros{
+      display:flex;
+      gap:15px;
+      flex-wrap:wrap;
+    }
+
+    .grafico-box{
+      background:#141414;
+      border-radius:24px;
+      padding:30px;
+      margin-top:35px;
+      border:1px solid rgba(255,255,255,.05);
+    }
+
+    .grafico-box h2{
+      margin-bottom:25px;
+    }
+
+    .grid-secundaria{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+      gap:25px;
+      margin-top:35px;
+    }
+
+    .card-info{
+      background:#141414;
+      border-radius:24px;
+      padding:30px;
+      border:1px solid rgba(255,255,255,.05);
+    }
+
+    .card-info h3{
+      margin-bottom:20px;
+    }
+
+    .lista-ranking{
+      display:flex;
+      flex-direction:column;
+      gap:15px;
+    }
+
+    .item-ranking{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      background:#1c1c1c;
+      padding:15px;
+      border-radius:14px;
+    }
+
+    .valor{
+      color:#ff9800;
+      font-weight:700;
+    }
+
+    .lucro{
+      color:#4ade80;
+      font-weight:700;
+    }
+
+    .prejuizo{
+      color:#ff5a5a;
+      font-weight:700;
+    }
+
+  </style>
+
+</head>
+<body>
+
+<div class="admin-layout">
+
+  <aside>
+
+    <h2>Burger Admin</h2>
+
+    <a href="admin.html">Dashboard</a>
+    <a href="pedidos.html">Pedidos</a>
+    <a href="produtos.html">Produtos</a>
+    <a href="estoque.html">Estoque</a>
+    <a href="fornecedores.html">Fornecedores</a>
+
+    <a href="#" onclick="logout()">
+      Sair
+    </a>
+
+  </aside>
+
+  <main>
+
+    <div class="topo-dashboard">
+
+      <div>
+
+        <h1>
+          Dashboard Financeiro
+        </h1>
+
+        <p style="color:#aaa;">
+          Controle geral da hamburgueria
+        </p>
+
+      </div>
+
+      <div class="filtros">
+
+        <select id="filtroPeriodo">
+
+          <option value="dia">
+            Hoje
+          </option>
+
+          <option value="semana">
+            Semana
+          </option>
+
+          <option value="mes">
+            Mês
+          </option>
+
+        </select>
+
+        <button
+          class="btn"
+          onclick="carregarDashboard()"
+        >
+          Atualizar
+        </button>
+
+      </div>
+
+    </div>
+
+    <!-- KPIs -->
+
+    <div class="dashboard-grid">
+
+      <div class="kpi">
+
+        <h3>Faturamento</h3>
+
+        <p id="faturamento">
+          R$ 0,00
+        </p>
+
+      </div>
+
+      <div class="kpi">
+
+        <h3>Lucro</h3>
+
+        <p id="lucro">
+          R$ 0,00
+        </p>
+
+      </div>
+
+      <div class="kpi">
+
+        <h3>Pedidos</h3>
+
+        <p id="pedidos">
+          0
+        </p>
+
+      </div>
+
+      <div class="kpi">
+
+        <h3>Gastos</h3>
+
+        <p id="gastos">
+          R$ 0,00
+        </p>
+
+      </div>
+
+    </div>
+
+    <!-- GRÁFICO -->
+
+    <div class="grafico-box">
+
+      <h2>
+        Faturamento
+      </h2>
+
+      <canvas id="graficoFaturamento"></canvas>
+
+    </div>
+
+    <!-- CARDS SECUNDÁRIOS -->
+
+    <div class="grid-secundaria">
+
+      <!-- MAIS VENDIDOS -->
+
+      <div class="card-info">
+
+        <h3>
+          Produtos Mais Vendidos
+        </h3>
+
+        <div
+          class="lista-ranking"
+          id="maisVendidos"
+        >
+
+        </div>
+
+      </div>
+
+      <!-- FORNECEDORES -->
+
+      <div class="card-info">
+
+        <h3>
+          Gastos com Fornecedores
+        </h3>
+
+        <div
+          class="lista-ranking"
+          id="listaFornecedores"
+        >
+
+        </div>
+
+      </div>
+
+      <!-- ALERTAS -->
+
+      <div class="card-info">
+
+        <h3>
+          Alertas de Estoque
+        </h3>
+
+        <div id="alertas">
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+<script src="js/supabase.js"></script>
+<script src="js/app.js"></script>
+<script src="js/auth.js"></script>
+
+<script>
+
+let grafico;
+
+/* ======================================
+   DASHBOARD
+====================================== */
+
+async function carregarDashboard() {
+
+  const periodo =
+    document.getElementById('filtroPeriodo').value;
+
+  const { data: pedidos } =
+    await supabaseClient
+      .from('pedidos')
+      .select('*');
+
+  const { data: fornecedores } =
+    await supabaseClient
+      .from('compras_fornecedor')
+      .select('*');
+
+  const { data: ingredientes } =
+    await supabaseClient
+      .from('ingredientes')
+      .select('*');
+
+  const { data: produtos } =
+    await supabaseClient
+      .from('produtos')
+      .select('*');
+
+  let faturamento = 0;
+  let gastos = 0;
+  let lucro = 0;
+
+  pedidos.forEach(pedido => {
+    faturamento += Number(pedido.total);
+  });
+
+  fornecedores.forEach(item => {
+    gastos += Number(item.valor);
+  });
+
+  lucro = faturamento - gastos;
+
+  document.getElementById('faturamento')
+    .innerText =
+      `R$ ${faturamento.toFixed(2)}`;
+
+  document.getElementById('gastos')
+    .innerText =
+      `R$ ${gastos.toFixed(2)}`;
+
+  document.getElementById('lucro')
+    .innerText =
+      `R$ ${lucro.toFixed(2)}`;
+
+  document.getElementById('pedidos')
+    .innerText =
+      pedidos.length;
+
+  carregarGrafico(pedidos);
+
+  carregarMaisVendidos(produtos);
+
+  carregarFornecedores();
+
+  carregarAlertas(ingredientes);
+
+}
+
+/* ======================================
+   GRÁFICO
+====================================== */
+
+function carregarGrafico(pedidos) {
+
+  const ctx =
+    document.getElementById('graficoFaturamento');
+
+  const labels = pedidos.map((_, index) =>
+    `Pedido ${index + 1}`
+  );
+
+  const valores = pedidos.map(p =>
+    Number(p.total)
+  );
+
+  if(grafico) {
+    grafico.destroy();
+  }
+
+  grafico = new Chart(ctx, {
+
+    type:'line',
+
+    data:{
+
+      labels,
+
+      datasets:[{
+
+        label:'Faturamento',
+
+        data:valores,
+
+        borderWidth:3,
+
+        tension:.4,
+
+        fill:true
+
+      }]
+
+    },
+
+    options:{
+
+      responsive:true,
+
+      plugins:{
+        legend:{
+          labels:{
+            color:'#fff'
+          }
+        }
+      },
+
+      scales:{
+
+        x:{
+          ticks:{
+            color:'#fff'
+          }
+        },
+
+        y:{
+          ticks:{
+            color:'#fff'
+          }
+        }
+
+      }
+
+    }
+
+  });
+
+}
+
+/* ======================================
+   MAIS VENDIDOS
+====================================== */
+
+async function carregarMaisVendidos(produtos) {
+
+  const box =
+    document.getElementById('maisVendidos');
+
+  box.innerHTML = '';
+
+  produtos.slice(0,5).forEach(produto => {
+
+    box.innerHTML += `
+    
+      <div class="item-ranking">
+
+        <span>
+          ${produto.nome}
+        </span>
+
+        <span class="valor">
+          R$ ${produto.preco}
+        </span>
+
+      </div>
+
+    `;
+
+  });
+
+}
+
+/* ======================================
+   FORNECEDORES
+====================================== */
+
+async function carregarFornecedores() {
+
+  const box =
+    document.getElementById('listaFornecedores');
+
+  box.innerHTML = '';
+
+  const { data } =
+    await supabaseClient
+      .from('fornecedores')
+      .select(`
+        *,
+        compras_fornecedor (
+          valor
+        )
+      `);
+
+  data.forEach(item => {
+
+    let total = 0;
+
+    item.compras_fornecedor.forEach(c => {
+      total += Number(c.valor);
+    });
+
+    box.innerHTML += `
+    
+      <div class="item-ranking">
+
+        <span>
+          ${item.nome}
+        </span>
+
+        <span class="prejuizo">
+          R$ ${total.toFixed(2)}
+        </span>
+
+      </div>
+
+    `;
+
+  });
+
+}
+
+/* ======================================
+   ALERTAS
+====================================== */
+
+function carregarAlertas(ingredientes) {
+
+  const box =
+    document.getElementById('alertas');
+
+  box.innerHTML = '';
+
+  const baixos = ingredientes.filter(item =>
+    Number(item.quantidade) <=
+    Number(item.estoque_minimo)
+  );
+
+  if(baixos.length === 0) {
+
+    box.innerHTML = `
+      <div class="alerta" style="background:#103b1d;">
+        ✅ Nenhum item acabando
+      </div>
+    `;
+
+    return;
+  }
+
+  baixos.forEach(item => {
+
+    box.innerHTML += `
+    
+      <div class="alerta">
+
+        ⚠️ ${item.nome}
+        está acabando
+
+      </div>
+
+    `;
+
+  });
+
+}
+
+/* ======================================
+   INIT
+====================================== */
+
+carregarDashboard();
+
+</script>
+
+</body>
+</html>
