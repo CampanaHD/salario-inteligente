@@ -27,7 +27,25 @@
     <aside class="sidebar">
       <div class="side-brand"><div class="brand-icon">₿</div><span>Salário<br><b>Inteligente</b></span></div>
       <nav id="mainNav">
-        <button class="nav-item active" data-page="dashboard">◫ <span>Visão geral</span></button>
+        <button class="nav-item active" data-page="dashboard">◫ <span>Início</span></button>
+        <div class="mobile-primary-nav" aria-label="Navegação principal no celular">
+          <button class="nav-item" data-page="transactions">＋ <span>Lançamentos</span></button>
+          <button class="nav-item" data-page="bills">▦ <span>Contas</span></button>
+          <button class="nav-item" data-page="cards">▣ <span>Cartões</span></button>
+          <button class="nav-item mobile-more-toggle" type="button" aria-expanded="false" aria-controls="mobileMorePanel">☰ <span>Mais</span></button>
+        </div>
+        <div class="mobile-more-panel" id="mobileMorePanel" aria-label="Todas as abas">
+          <div class="mobile-more-heading">Todas as áreas <button type="button" class="mobile-more-close" aria-label="Fechar menu">×</button></div>
+          <div class="mobile-more-grid">
+            <button class="nav-item" data-page="fuel">⛽ <span>Abastecimento</span></button>
+            <button class="nav-item" data-page="investments">↗ <span>Investimentos</span></button>
+            <button class="nav-item" data-page="planning">⌁ <span>Planejamento</span></button>
+            <button class="nav-item" data-page="goals">◎ <span>Metas</span></button>
+            <button class="nav-item" data-page="reports">▥ <span>Relatórios</span></button>
+            <button class="nav-item" data-page="family">♧ <span>Família</span></button>
+            <button class="nav-item" data-page="settings">⚙ <span>Configurações</span></button>
+          </div>
+        </div>
         <details class="nav-section" open><summary>Finanças</summary>
           <button class="nav-item" data-page="transactions">＋ <span>Lançamentos</span></button>
           <button class="nav-item" data-page="bills">▦ <span>Contas e parcelas</span></button>
