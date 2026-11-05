@@ -324,3 +324,18 @@ html[data-theme="dark"] .live-clock{background:#183b35;color:#9be8d0;border-colo
  html[data-theme="dark"] .mobile-primary-nav .nav-item.active,html[data-theme="dark"] .mobile-more-grid .nav-item.active{background:#183b35;color:#9be8d0}
  html[data-theme="dark"] .mobile-more-toggle[aria-expanded="true"],html[data-theme="dark"] .mobile-more-close{background:#24384a;color:var(--ink)}
 }
+
+/* ===== Responsividade geral + Abastecimento PRO ===== */
+html,body{max-width:100%;overflow-x:hidden}img,svg,canvas{max-width:100%}
+.table-wrap,.card table,.panel table,#pageContent table{-webkit-overflow-scrolling:touch}
+#pageContent table{display:block;overflow-x:auto;max-width:100%}
+.fz-filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;align-items:end;margin-bottom:16px}
+.fz-filters label{display:grid;gap:4px;font-size:12px;color:var(--muted)}
+.fz-filters select{padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--white);color:var(--ink);font-size:15px}
+.fz-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin:16px 0}
+.fz-pro .card{margin-bottom:16px}.fz-svg{width:100%;height:auto;display:block}
+.fz-row{display:flex;justify-content:space-between;font-size:14px;margin-top:10px}.fz-bar{height:8px;border-radius:8px;background:var(--line);overflow:hidden;margin-top:4px}.fz-bar i{display:block;height:100%;background:var(--teal)}
+.fz-sep{margin:24px 0 8px}.fuel-legacy .hero-strip{display:none}
+@media(max-width:900px){.main{padding-left:14px;padding-right:14px}.topbar{flex-wrap:wrap;gap:10px}.form-grid{grid-template-columns:1fr!important}.grid.stats{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))!important}.fz-cols{grid-template-columns:1fr}.modal{width:100vw!important;max-width:100vw!important;margin:auto 0 0!important;border-radius:22px 22px 0 0!important;max-height:92vh;overflow:auto}}
+@media(max-width:560px){input,select,textarea{font-size:16px!important}.btn,.mini-btn,.icon-btn{min-height:44px}.stat-value{font-size:22px!important}.hero-strip{flex-direction:column;align-items:flex-start;gap:8px}.top-actions{width:100%;justify-content:flex-end}}
+@supports(padding:max(0px)){.main{padding-bottom:max(24px,env(safe-area-inset-bottom))}}

@@ -27,3 +27,25 @@ Os registros pessoais continuam privados. Para um lançamento aparecer a todos, 
 - Investimentos são valores informados manualmente; não há cotações ou sincronização com corretoras.
 - O sistema não consulta saldos bancários.
 - Antes de uso comercial, valide as políticas RLS com usuários separados e revise segurança, privacidade e backups.
+
+## Versão Plus (plus.js + plus.css)
+Não exige mudanças no banco. Publique `plus.js` e `plus.css` junto com os demais arquivos.
+- **Painel Plus**: nota de saúde financeira (0–100), previsão de fim de mês, taxa de poupança, alertas (contas vencidas ou a vencer, orçamento estourado, gastos atípicos), categorias vs. mês anterior, gastos recorrentes detectados, regra 50/30/20 e reserva ideal.
+- **Lançamento rápido**: digite `mercado 45,90` ou `+salário 5000` e a categoria é sugerida automaticamente.
+- **Simulador de juros compostos**, **busca global** (Ctrl+K), **modo privacidade** (👁 oculta valores) e atalho **N** para novo lançamento.
+- **Imprimir / salvar PDF** do painel.
+
+## Veículos (veiculos.js + veiculos.css + supabase-veiculos.sql)
+Execute `supabase-veiculos.sql` no Supabase. A aba Abastecimento virou **Veículos**: resumo com avisos de troca vencida ou próxima, histórico unificado (abastecimentos, manutenções, despesas), plano de manutenção, análises com gráficos e cadastro de frota.
+
+## Abas PRO (abas.js)
+Lançamentos (filtros, busca, CSV, gráficos), Contas (calendário de vencimentos, alertas), Metas (valor mensal necessário), Investimentos (distribuição e evolução) e Cartões (uso do limite e faturas projetadas). Sem mudanças no banco.
+
+## Abas PRO 2 (abas2.js)
+Início (atalhos, fluxo 6 meses, vencimentos), Planejamento (projeção de saldo e simulador de corte de gastos), Relatórios (dia da semana, comparativo 3 meses, CSV anual, PDF), Família (indicadores do grupo) e Configurações (modo compacto, lembretes de contas).
+
+## Contas bancárias (contas.js + supabase-contas.sql)
+Execute `supabase-contas.sql`. Cadastre bancos com 1 toque (Nubank, Santander, Itaú…), escolha conta e forma de pagamento ao lançar (lembra a última usada), saldo calculado automaticamente, crédito separado como fatura a pagar e ajuste de saldo pelo valor real do banco.
+
+## Etapa 2 de contas (supabase-contas2.sql)
+Transferência entre contas (não entra em receitas/despesas), pagamento de fatura (baixa o saldo sem duplicar a despesa) e escolha do cartão de crédito ao lançar com forma de pagamento “Crédito”.

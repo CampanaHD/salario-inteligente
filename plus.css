@@ -1,0 +1,22 @@
+/* Salário Inteligente Plus — usa as variáveis de tema existentes (claro/escuro) */
+.pl-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:16px}
+.pl-card{background:var(--white);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:var(--shadow)}
+.pl-card h3{margin:0 0 4px;font-size:16px}.pl-card .sub{color:var(--muted);font-size:13px;margin:0 0 12px}
+.pl-score{display:flex;align-items:center;gap:18px}
+.pl-ring{--v:0;width:96px;height:96px;border-radius:50%;display:grid;place-items:center;flex:none;background:conic-gradient(var(--c,var(--teal)) calc(var(--v)*1%),var(--line) 0)}
+.pl-ring b{width:74px;height:74px;border-radius:50%;background:var(--white);display:grid;place-items:center;font-size:24px}
+.pl-list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.pl-list li{display:flex;justify-content:space-between;gap:10px;font-size:14px;padding:8px 0;border-bottom:1px solid var(--line)}
+.pl-list li:last-child{border:0}
+.pl-up{color:var(--red)}.pl-down{color:var(--teal)}.pl-warn{color:var(--amber)}
+.pl-alert{padding:10px 12px;border-radius:12px;background:var(--mint);font-size:14px;margin-bottom:8px}
+.pl-alert.bad{background:color-mix(in srgb,var(--red) 14%,transparent)}
+.pl-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:12px}
+.pl-form label{font-size:12px;color:var(--muted);display:grid;gap:4px}
+.pl-form input{padding:9px;border:1px solid var(--line);border-radius:10px;background:var(--white);color:var(--ink)}
+.pl-quick{display:flex;gap:8px;flex-wrap:wrap}.pl-quick input{flex:1;min-width:200px;padding:11px;border:1px solid var(--line);border-radius:12px;background:var(--white);color:var(--ink)}
+.pl-bar{height:8px;border-radius:8px;background:var(--line);overflow:hidden}.pl-bar i{display:block;height:100%;background:var(--teal)}
+.pv-hide{filter:blur(7px);user-select:none}
+#plusSearch{border:0;border-radius:18px;padding:18px;width:min(560px,92vw);background:var(--white);color:var(--ink);box-shadow:var(--shadow)}
+#plusSearch input{width:100%;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--white);color:var(--ink);margin-bottom:10px;box-sizing:border-box}
+@media print{.sidebar,.topbar,footer,.pl-noprint{display:none!important}}
