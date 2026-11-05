@@ -57,3 +57,13 @@ Atalhos de período (Hoje, Semana, Este mês, Mês passado, 90 dias, Ano, Tudo),
 - Veículos: tipo carro/moto/outro (execute `supabase-veiculos2.sql`), aba **Calculadora** (km rodados × consumo × preço do litro × tanque) e ordenação no histórico.
 - Planejamento (`planejamento.js`): fluxo dos próximos 60 dias com saldo projetado e alerta de saldo negativo, orçamento do mês por categoria editável e planejador de objetivo.
 - Ordenação por botões em Contas, Metas, Investimentos e Veículos.
+
+## Etapa 5
+- Benefícios VR/VA/VT na aba Contas bancárias (execute `supabase-beneficios.sql`): saldo próprio fora do saldo das contas, valor e dia do crédito, botão “Creditar mês”, aviso de crédito pendente e estimativa de quantos dias o saldo dura.
+- Tema PRO (`tema.css`, `tema.js`): menu lateral rolável e compacto em notebooks, memória das seções abertas, barra mobile flutuante e botão **Sair da conta** no menu “Mais” do celular.
+
+## Etapa 6
+- Cartões: botão **Editar** (limite, fechamento, vencimento, juros…), e cartões excluídos não aparecem mais ao lançar compra.
+- Família: encerrar o grupo agora apaga o histórico compartilhado e os integrantes; criar novo grupo começa zerado; botão para limpar o histórico antigo.
+- Paletas de cor (Esmeralda, Oceano, Violeta, Pôr do sol, Rosa, Grafite) em Configurações.
+- Celular: app instalável (PWA: `manifest.json`, `sw.js`, ícones), importação de extrato CSV/OFX e “colar notificação do banco” na aba Contas bancárias.
