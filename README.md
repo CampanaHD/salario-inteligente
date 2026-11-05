@@ -49,3 +49,6 @@ Execute `supabase-contas.sql`. Cadastre bancos com 1 toque (Nubank, Santander, I
 
 ## Etapa 2 de contas (supabase-contas2.sql)
 Transferência entre contas (não entra em receitas/despesas), pagamento de fatura (baixa o saldo sem duplicar a despesa) e escolha do cartão de crédito ao lançar com forma de pagamento “Crédito”.
+
+## Lançamentos (lista renovada)
+Atalhos de período (Hoje, Semana, Este mês, Mês passado, 90 dias, Ano, Tudo), filtros por tipo, status, categoria, conta, forma de pagamento e faixa de valor, ordenação por botões (recentes, antigos, maior/menor valor, A–Z, pendentes primeiro), agrupamento por dia ou mês com saldo do grupo, etiquetas de categoria/conta/forma de pagamento e “Mostrar mais”.

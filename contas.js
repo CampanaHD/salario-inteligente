@@ -43,4 +43,5 @@ const _d=dashboardHTML;dashboardHTML=function(){const on=accts.filter(ON);return
 const _s=settingsHTML;settingsHTML=function(){return `<div class="vh-card" style="margin-bottom:16px"><h3 style="margin:0 0 6px">Saldo automático</h3><p class="muted" style="margin:0 0 10px">${accts.length?'Ativo: o saldo vem das suas contas e muda com cada lançamento. O campo “saldo” abaixo reflete o total calculado.':'Hoje o saldo é digitado à mão. Ative as contas para ele ser calculado sozinho.'}</p><button class="btn primary" data-go="accounts">${accts.length?'Gerenciar contas':'Ativar contas e saldo automático'}</button></div>`+_s()};
 const nav=()=>{const mk=()=>{const b=document.createElement('button');b.className='nav-item';b.dataset.page='accounts';b.innerHTML='🏦 <span>Contas bancárias</span>';return b};const s=document.querySelector('.nav-section');if(s)s.insertBefore(mk(),s.children[2]);const g=document.querySelector('.mobile-more-grid');if(g)g.prepend(mk())};nav();
 const _bp=bindPageActions;bindPageActions=function(){_bp();document.querySelectorAll('#pageContent [data-go]').forEach(b=>b.onclick=()=>goPage(b.dataset.go))};
+window.CT={accts:()=>accts};
 })();
