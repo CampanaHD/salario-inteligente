@@ -52,3 +52,8 @@ Transferência entre contas (não entra em receitas/despesas), pagamento de fatu
 
 ## Lançamentos (lista renovada)
 Atalhos de período (Hoje, Semana, Este mês, Mês passado, 90 dias, Ano, Tudo), filtros por tipo, status, categoria, conta, forma de pagamento e faixa de valor, ordenação por botões (recentes, antigos, maior/menor valor, A–Z, pendentes primeiro), agrupamento por dia ou mês com saldo do grupo, etiquetas de categoria/conta/forma de pagamento e “Mostrar mais”.
+
+## Etapa 4
+- Veículos: tipo carro/moto/outro (execute `supabase-veiculos2.sql`), aba **Calculadora** (km rodados × consumo × preço do litro × tanque) e ordenação no histórico.
+- Planejamento (`planejamento.js`): fluxo dos próximos 60 dias com saldo projetado e alerta de saldo negativo, orçamento do mês por categoria editável e planejador de objetivo.
+- Ordenação por botões em Contas, Metas, Investimentos e Veículos.
