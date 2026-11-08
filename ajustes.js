@@ -12,7 +12,7 @@ const _lf=leaveFamily;leaveFamily=async function(){if(!(familyOwnerId&&familyOwn
 const _cf=createFamily;createFamily=async function(){if(!profile.family_code&&(!familyOwnerId||familyOwnerId===user.id)){await sb.from('family_transactions').delete().eq('family_owner_id',user.id);await sb.from('family_members').delete().eq('family_owner_id',user.id)}return _cf()};
 const _fh=familyHTML;familyHTML=function(){return (familyOwnerId===user.id&&profile.family_code?'<div class="vh-acts-bar"><button class="btn outline" data-fam-clear>🧹 Limpar histórico compartilhado</button></div>':'')+_fh()};
 /* --- paletas e app --- */
-const PAL=[['teal','Esmeralda','#087f72'],['ocean','Oceano','#1565c0'],['violet','Violeta','#6d4aff'],['sunset','Pôr do sol','#e8590c'],['rose','Rosa','#d6336c'],['graphite','Grafite','#37474f']];
+const PAL=[['teal','Esmeralda','#087f72'],['ocean','Oceano','#1565c0'],['violet','Violeta','#6d4aff'],['sunset','Pôr do sol','#e8590c'],['rose','Rosa','#d6336c'],['graphite','Grafite','#37474f'],['coffee','Café','#8d5524']];
 const setPal=p=>{document.documentElement.dataset.palette=p;localStorage.setItem('si_palette',p)};setPal(localStorage.getItem('si_palette')||'teal');
 let ip=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();ip=e});
 const ios=/iphone|ipad|ipod/i.test(navigator.userAgent),standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone;
@@ -22,5 +22,6 @@ const _bp=bindPageActions;bindPageActions=function(){_bp();
   document.querySelectorAll('[data-pal]').forEach(b=>b.onclick=()=>{setPal(b.dataset.pal);renderPage()});
   document.querySelectorAll('[data-pwa]').forEach(b=>b.onclick=async()=>{if(!ip)return;ip.prompt();await ip.userChoice;ip=null;renderPage()});
   document.querySelectorAll('[data-fam-clear]').forEach(b=>b.onclick=async()=>{if(!confirm('Apagar todas as movimentações compartilhadas do grupo? Isso não pode ser desfeito.'))return;const r=await sb.from('family_transactions').delete().eq('family_owner_id',user.id);if(r.error)return toast(r.error.message);await loadFamily();renderPage();toast('Histórico compartilhado apagado.')})};
+if(location.protocol.startsWith('http')){const l=document.createElement('link');l.rel='manifest';l.href='manifest.json';document.head.appendChild(l)}
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
 })();

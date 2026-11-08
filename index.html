@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#073b3a"><link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="icon-192.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><title>Salário Inteligente</title>
+  <meta name="theme-color" content="#073b3a"><link rel="apple-touch-icon" href="icon-192.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><title>Salário Inteligente</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="plus.css">
   <link rel="stylesheet" href="veiculos.css">
@@ -82,7 +82,7 @@
       <div class="segmented"><button type="button" class="selected" data-kind="expense">Despesa</button><button type="button" data-kind="income">Receita</button></div>
       <div class="form-grid">
         <label>Descrição<input id="txDescription" required placeholder="Ex.: Mercado"></label>
-        <label>Categoria<select id="txCategory"><option>Alimentação</option><option>Moradia</option><option>Transporte</option><option>Saúde</option><option>Lazer</option><option>Educação</option><option>Salário</option><option>Contas</option><option>Outros</option></select></label>
+        <label>Categoria<select id="txCategory"><option>Alimentação</option><option>Moradia</option><option>Transporte</option><option>Saúde</option><option>Lazer</option><option>Educação</option><option>Salário</option><option>Contas</option><option>Veículos</option><option>Cartão de Crédito</option><option>Terceiros</option><option>Pessoal</option><option>Outros</option></select></label>
         <label>Valor (R$)<input id="txAmount" required type="number" min="0.01" step="0.01" placeholder="0,00"></label>
         <label>Data<input id="txDate" required type="date"></label>
         <label class="checkline"><input id="txPaid" type="checkbox" checked> Já foi pago/recebido</label>
@@ -131,6 +131,7 @@
   <script src="veiculos.js"></script>
   <script src="contas.js"></script>
   <script src="plus.js"></script>
+  <script src="horaextra.js"></script>
   <script src="importar.js"></script>
   <script src="ajustes.js"></script>
   <script src="tema.js"></script>
