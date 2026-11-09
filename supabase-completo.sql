@@ -69,10 +69,12 @@ create policy "account_transfers_own" on public.account_transfers for all using 
 alter table public.transactions add column if not exists card_id uuid references public.credit_cards(id) on delete set null;
 
 -- ===== supabase-beneficios =====
--- Execute depois de supabase-contas.sql. Benefícios (VR, VA, VT) como contas especiais.
+-- Execute depois de supabase-contas.sql. Benefícios (VR, VA, VT e Vale Combustível) como contas especiais.
 alter table public.accounts drop constraint if exists accounts_kind_check;
 alter table public.accounts add constraint accounts_kind_check check (kind in ('corrente','poupanca','carteira','investimento','beneficio'));
-alter table public.accounts add column if not exists benefit_type text check (benefit_type in ('VR','VA','VT'));
+alter table public.accounts add column if not exists benefit_type text check (benefit_type in ('VR','VA','VT','VC'));
+alter table public.accounts drop constraint if exists accounts_benefit_type_check;
+alter table public.accounts add constraint accounts_benefit_type_check check (benefit_type is null or benefit_type in ('VR','VA','VT','VC'));
 alter table public.accounts add column if not exists monthly_amount numeric(14,2) not null default 0;
 alter table public.accounts add column if not exists credit_day int check (credit_day between 1 and 31);
 
@@ -128,4 +130,31 @@ notify pgrst, 'reload schema';
 
 -- ===== crédito automático dos benefícios =====
 alter table public.accounts add column if not exists auto_credit boolean not null default false;
+notify pgrst, 'reload schema';
+
+-- ===== veículos: motorista, aquisição/financiamento e lavagem como manutenção =====
+alter table public.vehicles add column if not exists driver_name text;
+alter table public.vehicles add column if not exists state_uf text default 'SP';
+alter table public.vehicles add column if not exists purchase_price numeric(14,2);
+alter table public.vehicles add column if not exists purchase_date date;
+alter table public.vehicles add column if not exists down_payment numeric(14,2) default 0;
+alter table public.vehicles add column if not exists financed boolean not null default false;
+alter table public.vehicles add column if not exists fin_installments int;
+alter table public.vehicles add column if not exists fin_installment_amount numeric(14,2);
+alter table public.vehicles add column if not exists fin_installments_paid int not null default 0;
+alter table public.vehicles add column if not exists fin_due_day int;
+alter table public.vehicles add column if not exists financing_bill_id uuid;
+alter table public.fuel_records add column if not exists driver text;
+alter table public.vehicle_expenses add column if not exists driver text;
+update public.vehicle_expenses set kind = 'manutencao' where category = 'Lavagem';
+notify pgrst, 'reload schema';
+
+-- ===== Vale Combustível, pagamentos de fatura com forma de pagamento e financiamento =====
+alter table public.accounts drop constraint if exists accounts_benefit_type_check;
+alter table public.accounts add constraint accounts_benefit_type_check check (benefit_type in ('VR','VA','VT','VC'));
+alter table public.account_transfers alter column from_account drop not null;
+alter table public.account_transfers add column if not exists pay_method text;
+alter table public.account_transfers add column if not exists memo text;
+alter table public.account_transfers add column if not exists card_id uuid references public.credit_cards(id) on delete set null;
+alter table public.vehicles add column if not exists fin_first_due date;
 notify pgrst, 'reload schema';
