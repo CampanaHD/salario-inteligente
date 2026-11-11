@@ -1,0 +1,25 @@
+/* ===== Planos de assinatura ===== */
+.plan-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:stretch}
+.plan-card2{position:relative;display:flex;flex-direction:column;gap:6px;padding:24px 22px;border-radius:22px;background:var(--white);border:1px solid var(--line);box-shadow:var(--shadow)}
+.plan-card2.featured{border-color:var(--teal);box-shadow:0 0 0 1px var(--teal),0 18px 44px color-mix(in srgb,var(--teal) 22%,transparent)}
+.plan-card2.current{background:linear-gradient(180deg,color-mix(in srgb,var(--teal) 10%,var(--white)),var(--white))}
+.plan-ribbon{position:absolute;top:-12px;left:22px;padding:4px 12px;border-radius:999px;background:var(--teal);color:#fff;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
+.plan-name{font-size:14px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.plan-price b{font-size:34px;letter-spacing:-1px;color:var(--ink)}.plan-price small{margin-left:4px;color:var(--muted);font-size:14px}
+.plan-sub{margin:0 0 6px}
+.plan-card2 ul{list-style:none;margin:8px 0 18px;padding:0;display:grid;gap:9px;flex:1}
+.plan-card2 li{position:relative;padding-left:24px;font-size:14px;line-height:1.35;color:var(--ink)}
+.plan-card2 li:before{content:"✓";position:absolute;left:0;top:0;width:17px;height:17px;border-radius:50%;background:color-mix(in srgb,var(--teal) 18%,transparent);color:var(--teal);font-size:11px;font-weight:900;display:grid;place-items:center;margin-top:1px}
+.plan-card2 .btn[disabled]{opacity:.6;cursor:default}
+.plan-foot{margin-top:14px;text-align:center}
+.plan-locked{max-width:520px;margin:48px auto;padding:36px 28px;text-align:center;border-radius:22px;background:var(--white);border:1px solid var(--line);box-shadow:var(--shadow)}
+.plan-lock-ico{width:64px;height:64px;margin:0 auto 14px;border-radius:50%;display:grid;place-items:center;font-size:28px;background:color-mix(in srgb,var(--teal) 16%,transparent)}
+.plan-locked h3{margin:0 0 8px;color:var(--ink)}
+.plan-locked-acts{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.nav-item .plan-lock{margin-left:auto;font-style:normal;font-size:12px;opacity:.75}
+.nav-item.is-locked{opacity:.78}
+.mobile-primary-nav .plan-lock{position:absolute;top:2px;right:6px;margin:0;font-size:10px}
+.mobile-primary-nav .nav-item,.mobile-more-grid .nav-item{position:relative}
+.plan-chip{display:inline-block;margin-top:3px;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:700;background:color-mix(in srgb,var(--teal) 16%,transparent);color:var(--teal)}
+.plan-chip[data-plan=free]{background:var(--line);color:var(--muted)}
+@media(max-width:900px){.plan-grid{grid-template-columns:1fr}.plan-card2.featured{order:-1}}

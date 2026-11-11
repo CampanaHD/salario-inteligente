@@ -25,3 +25,13 @@ Teclas: `N` novo lançamento, `Ctrl + K` busca.
 - **Conciliação:** cada conta usada no pagamento da fatura recebe seu débito; o pagamento também aparece em Lançamentos como movimentação de transferência, sem duplicar a despesa original.
 
 Essas melhorias usam as tabelas e colunas já presentes na versão Plus (`investments`, `transactions`, `card_purchases` e `account_transfers`). Não há uma nova migração SQL específica para esta atualização. Faça backup antes de substituir os arquivos publicados.
+
+
+## Planos de assinatura
+- **Gratuito (R$ 0):** painel, lançamentos, contas e parcelas, metas e configurações.
+- **Premium (R$ 9,90/mês):** tudo do Gratuito + cartões de crédito, contas bancárias, veículos, hora extra e relatórios.
+- **Completo (R$ 19,90/mês):** tudo do Premium + investimentos, planejamento futuro, Painel Plus, família e backup completo.
+
+Instalação: execute `planos.sql` no Supabase (uma vez) e publique `planos.js` e `planos.css` com os demais arquivos.
+Preços, textos e o que cada plano libera ficam no início de `planos.js`. Links de pagamento: `PLAN_CONFIG.checkout`.
+Para liberar um plano manualmente, use o comando comentado no final de `planos.sql`.

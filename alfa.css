@@ -1,0 +1,155 @@
+/* ===== Tema ALFA — preto com destaques em vermelho (baseado no menu "Área do Cliente") =====
+   Ativado quando <html data-palette="alfa">. Carregue este arquivo por ÚLTIMO no index.html. */
+
+html[data-palette=alfa][data-palette]{
+  color-scheme:dark;
+  --ink:#f2f2f5; --muted:#9b9ba8;
+  --teal:#e5384f; --teal-dark:#a01d33;
+  --mint:#2a1017; --bg:#09090c; --white:#121217; --line:#26262e;
+  --red:#ff5a6e; --amber:#f5c542;
+  --shadow:0 14px 38px #0008;
+  --alfa-red-grad:linear-gradient(135deg,#b3243a 0%,#8f1d2e 100%);
+  --alfa-card:#121217; --alfa-card-2:#17171d; --alfa-border:#2a2a33;
+  --alfa-tint:#2a1017; --alfa-tint-border:#6b2230;
+}
+
+/* Fundo geral com brilho vermelho discreto */
+html[data-palette=alfa][data-palette] body{
+  background:radial-gradient(ellipse at 0% 0%,#3a0f18 0,transparent 38%),radial-gradient(ellipse at 100% 100%,#1c0a10 0,transparent 40%),#09090c;
+  color:var(--ink);
+}
+html[data-palette=alfa][data-palette] .main{background:transparent;color:var(--ink)}
+html[data-palette=alfa][data-palette] .topbar{background:color-mix(in srgb,#09090c 82%,transparent)}
+html[data-palette=alfa][data-palette] .topbar h2{color:#fff}
+html[data-palette=alfa][data-palette] .eyebrow,html[data-palette=alfa][data-palette] .text-btn{color:#ff6b7f}
+html[data-palette=alfa][data-palette] .text-btn:hover{color:#ff9aa9}
+html[data-palette=alfa][data-palette] .muted,html[data-palette=alfa][data-palette] small{color:var(--muted)}
+html[data-palette=alfa][data-palette] footer{color:var(--muted)}
+
+/* ---------- MENU LATERAL ---------- */
+html[data-palette=alfa][data-palette] .sidebar{
+  background:linear-gradient(180deg,#1a0b10 0%,#0e0e12 20%,#09090c 100%)!important;
+  border-right:1px solid #1f1f26;
+  box-shadow:8px 0 40px #0009;
+  color:#e9e9ef;
+}
+html[data-palette=alfa][data-palette] .side-brand{color:#fff}
+html[data-palette=alfa][data-palette] .side-brand b{color:#fff}
+html[data-palette=alfa][data-palette] .brand-icon{background:var(--alfa-red-grad);color:#fff;box-shadow:0 8px 22px #b3243a55}
+html[data-palette=alfa][data-palette] .nav-item{color:#d6d6de;border:1px solid transparent;background:transparent}
+html[data-palette=alfa][data-palette] .nav-item:hover{background:#17171d;color:#fff;border-color:#2a2a33}
+html[data-palette=alfa][data-palette] .nav-item.active,
+html[data-palette=alfa][data-palette] .nav-item.active:hover{
+  background:var(--alfa-red-grad);
+  color:#fff;
+  border-color:#c93a50;
+  box-shadow:0 8px 22px #b3243a55;
+}
+/* itens dentro das seções: cartão escuro avermelhado quando ativo */
+html[data-palette=alfa][data-palette] .nav-section .nav-item.active,
+html[data-palette=alfa][data-palette] .nav-section .nav-item.active:hover{
+  background:linear-gradient(135deg,#3b1119,#2a0d13);
+  border-color:#8f2a3a;
+  color:#fff;
+  box-shadow:inset 3px 0 0 var(--amber);
+}
+html[data-palette=alfa][data-palette] .nav-section summary{color:#f0f0f5;font-weight:800;letter-spacing:.09em}
+html[data-palette=alfa][data-palette] .nav-section summary::after{color:#e5384f}
+html[data-palette=alfa][data-palette] .nav-section[open]>summary{color:#fff}
+html[data-palette=alfa][data-palette] .side-bottom{border-top:1px solid #1f1f26}
+html[data-palette=alfa][data-palette] .user-mini b{color:#fff}
+html[data-palette=alfa][data-palette] .user-mini small{color:var(--muted)}
+html[data-palette=alfa][data-palette] .avatar{background:var(--alfa-red-grad);color:#fff}
+html[data-palette=alfa][data-palette] .btn.ghost{background:transparent;color:#ff8a9a;border:1px solid #2a2a33}
+html[data-palette=alfa][data-palette] .btn.ghost:hover{background:#2a1017;border-color:#8f2a3a;color:#ffb3bd}
+html[data-palette=alfa][data-palette] #mainNav{scrollbar-color:#2a2a33 transparent}
+
+/* ---------- BOTÕES / CAMPOS ---------- */
+html[data-palette=alfa][data-palette] .btn.primary{background:var(--alfa-red-grad);color:#fff;border:0;box-shadow:0 8px 22px #b3243a44}
+html[data-palette=alfa][data-palette] .btn.primary:hover{background:linear-gradient(135deg,#c42a42,#a01d33);transform:translateY(-1px)}
+html[data-palette=alfa][data-palette] .btn.outline,html[data-palette=alfa][data-palette] .mini-btn,html[data-palette=alfa][data-palette] .icon-btn{background:var(--alfa-card-2);color:#f2f2f5;border:1px solid var(--alfa-border)}
+html[data-palette=alfa][data-palette] .btn.outline:hover,html[data-palette=alfa][data-palette] .mini-btn:hover,html[data-palette=alfa][data-palette] .icon-btn:hover{background:#2a1017;border-color:#8f2a3a;color:#fff}
+html[data-palette=alfa][data-palette] input,html[data-palette=alfa][data-palette] select,html[data-palette=alfa][data-palette] textarea{background:#0c0c10;color:#f2f2f5;border:1px solid var(--alfa-border)}
+html[data-palette=alfa][data-palette] input:focus,html[data-palette=alfa][data-palette] select:focus,html[data-palette=alfa][data-palette] textarea:focus{outline:2px solid #e5384f55;border-color:#e5384f}
+html[data-palette=alfa][data-palette] input::placeholder,html[data-palette=alfa][data-palette] textarea::placeholder{color:#6f6f7c}
+html[data-palette=alfa][data-palette] select option{background:#121217;color:#f2f2f5}
+html[data-palette=alfa][data-palette] label{color:#c8c8d2}
+html[data-palette=alfa][data-palette] .checkline{color:#e2e2ea}
+html[data-palette=alfa][data-palette] .checkline input{accent-color:#e5384f}
+html[data-palette=alfa][data-palette] .dot{background:#e5384f}
+
+/* ---------- CARTÕES / PAINÉIS ---------- */
+html[data-palette=alfa][data-palette] .card,html[data-palette=alfa][data-palette] .panel,html[data-palette=alfa][data-palette] .stat-card,html[data-palette=alfa][data-palette] .feature-card,html[data-palette=alfa][data-palette] .plan-card,html[data-palette=alfa][data-palette] .vh-card,html[data-palette=alfa][data-palette] .vh-item,html[data-palette=alfa][data-palette] .lt-row,
+html[data-palette=alfa][data-palette] .auth-card,html[data-palette=alfa][data-palette] .budget-item,html[data-palette=alfa][data-palette] .cc-card,html[data-palette=alfa][data-palette] .insight-tile{
+  background:var(--alfa-card);color:var(--ink);border:1px solid #22222a;
+  box-shadow:0 1px 2px #0006,0 12px 30px #0006;
+}
+html[data-palette=alfa][data-palette] .stat-card:before{background:linear-gradient(90deg,#e5384f,#8f1d2e)}
+html[data-palette=alfa][data-palette] .report-stats .stat-card:after{background:#e5384f}
+html[data-palette=alfa][data-palette] .stat-icon,html[data-palette=alfa][data-palette] .list-icon{background:linear-gradient(145deg,#3b1119,#24090f);color:#ff6b7f}
+html[data-palette=alfa][data-palette] .stat-value,html[data-palette=alfa][data-palette] .insight-tile b,html[data-palette=alfa][data-palette] .budget-title,html[data-palette=alfa][data-palette] .budget-spent{color:#fff}
+html[data-palette=alfa][data-palette] .budget-item small,html[data-palette=alfa][data-palette] .report-total span,html[data-palette=alfa][data-palette] .table-note{color:var(--muted)}
+html[data-palette=alfa][data-palette] .positive{color:#3ecf8e}
+html[data-palette=alfa][data-palette] .negative{color:#ff5a6e}
+html[data-palette=alfa][data-palette] .progress,html[data-palette=alfa][data-palette] .bar-track,html[data-palette=alfa][data-palette] .budget-track,html[data-palette=alfa][data-palette] .fuel-chart-track{background:#23232b}
+html[data-palette=alfa][data-palette] .progress span,html[data-palette=alfa][data-palette] .bar-track span{background:linear-gradient(90deg,#8f1d2e,#e5384f)}
+html[data-palette=alfa][data-palette] .trend-bar.expense{background:linear-gradient(180deg,#ff8a9a,#c42a42)}
+html[data-palette=alfa][data-palette] .trend-bar.income{background:linear-gradient(180deg,#5fe0a8,#1f9d6a)}
+html[data-palette=alfa][data-palette] .report-income:after{background:#3ecf8e!important}
+html[data-palette=alfa][data-palette] .report-expense:after{background:#e5384f!important}
+
+/* destaque grande (hero) e cartão de crédito */
+html[data-palette=alfa][data-palette] .hero-strip{
+  background:radial-gradient(circle at 88% 12%,#e5384f66,transparent 34%),linear-gradient(120deg,#1a0a0f,#6e1626 60%,#a01d33);
+  box-shadow:0 14px 34px #b3243a33;border:1px solid #4a1823;
+}
+html[data-palette=alfa][data-palette] .hero-strip p{color:#f3cfd5}
+html[data-palette=alfa][data-palette] .credit-card,html[data-palette=alfa][data-palette] .cc-face{
+  background:radial-gradient(circle at 90% 10%,#ffffff22,transparent 34%),linear-gradient(135deg,#0f0f14,#5a1420 55%,#a01d33);
+  color:#fff;
+}
+html[data-palette=alfa][data-palette] .credit-card-sub,html[data-palette=alfa][data-palette] .credit-limit-label{color:#f1c9d0}
+html[data-palette=alfa][data-palette] .card-brand-badge{background:#ffffff22;color:#fff}
+
+/* ---------- TABELAS / ABAS / AVISOS ---------- */
+html[data-palette=alfa][data-palette] .data-table th{background:var(--alfa-card-2);color:#d6d6de}
+html[data-palette=alfa][data-palette] .data-table td,html[data-palette=alfa][data-palette] .list-row,html[data-palette=alfa][data-palette] .report-total,html[data-palette=alfa][data-palette] .report-summary-row{border-color:#22222a}
+html[data-palette=alfa][data-palette] .data-table tbody tr:nth-child(even) td{background:#0f0f14}
+html[data-palette=alfa][data-palette] .data-table tbody tr:hover td{background:#24101a!important;color:#fff}
+html[data-palette=alfa][data-palette] .tabs,html[data-palette=alfa][data-palette] .segmented,html[data-palette=alfa][data-palette] .salary-info div{background:var(--alfa-card-2)}
+html[data-palette=alfa][data-palette] .tab.active{background:linear-gradient(135deg,#3b1119,#2a0d13);color:#fff;box-shadow:inset 0 0 0 1px #8f2a3a}
+html[data-palette=alfa][data-palette] .segmented .selected{background:var(--alfa-red-grad);color:#fff}
+html[data-palette=alfa][data-palette] .notice-card,html[data-palette=alfa][data-palette] .settings-form .notice,html[data-palette=alfa][data-palette] .notice{background:var(--alfa-tint);border-color:var(--alfa-tint-border);color:#ffc2cb}
+html[data-palette=alfa][data-palette] .live-clock{background:var(--alfa-tint);color:#ff9aa9;border-color:var(--alfa-tint-border)}
+html[data-palette=alfa][data-palette] .family-share-option{background:var(--alfa-card-2);color:#f2f2f5}
+
+/* ---------- JANELAS (MODAIS) ---------- */
+html[data-palette=alfa][data-palette] .modal,html[data-palette=alfa][data-palette] dialog,html[data-palette=alfa][data-palette] dialog.si-dialog{background:#121217!important;color:#f2f2f5;border:1px solid #2a2a33}
+html[data-palette=alfa][data-palette] dialog::backdrop,html[data-palette=alfa][data-palette] .modal::backdrop{background:#000000b3;backdrop-filter:blur(4px)}
+html[data-palette=alfa][data-palette] .modal-head h3{color:#fff}
+
+/* ---------- LOGIN ---------- */
+html[data-palette=alfa][data-palette] .auth-shell{background:radial-gradient(circle at 18% 12%,#4a1019,transparent 38%),radial-gradient(circle at 90% 90%,#2a0a12,transparent 40%),#09090c}
+html[data-palette=alfa][data-palette] .auth-brand h1,html[data-palette=alfa][data-palette] .auth-card h1{color:#fff}
+html[data-palette=alfa][data-palette] .auth-brand p{color:#b9b9c4}
+
+/* ---------- PALETAS / DETALHES ---------- */
+html[data-palette=alfa][data-palette] .pal-sw{border-color:#2a2a33}
+html[data-palette=alfa][data-palette] .pal-sw.on{border-color:#fff}
+::-webkit-scrollbar-thumb{background:#2a2a33}
+
+/* ---------- CELULAR (barra inferior) ---------- */
+@media(max-width:900px){
+  html[data-palette=alfa][data-palette] .sidebar{background:rgba(12,12,16,.97)!important;border:1px solid #26262e;box-shadow:0 12px 34px #000a}
+  html[data-palette=alfa][data-palette] .mobile-primary-nav .nav-item.active,
+  html[data-palette=alfa][data-palette] .mobile-more-grid .nav-item.active{background:var(--alfa-red-grad);color:#fff;box-shadow:none;border-color:#c93a50}
+  html[data-palette=alfa][data-palette] .mobile-more-grid .nav-item{background:#17171d;border-color:#2a2a33;color:#e6e6ee}
+  html[data-palette=alfa][data-palette] .mobile-more-toggle[aria-expanded="true"],html[data-palette=alfa][data-palette] .mobile-more-close{background:#2a1017;color:#fff}
+  html[data-palette=alfa][data-palette] .mobile-more-heading{color:#fff}
+  html[data-palette=alfa][data-palette] .mobile-logout{color:#ff8a9a;background:#2a1017;border-color:#6b2230}
+}
+
+/* ajustes finos */
+html[data-palette=alfa][data-palette] .side-brand span{color:#e9e9ef}
+html[data-palette=alfa][data-palette] .topbar{background:linear-gradient(180deg,#09090cd9,#09090c00)!important;backdrop-filter:none}
+html[data-palette=alfa][data-palette] .side-bottom{border-top:0}
