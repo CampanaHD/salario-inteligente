@@ -58,8 +58,3 @@ dialog.si-dialog textarea{width:100%;padding:11px;box-sizing:border-box;font-siz
 
 /* pizza */
 .pie{display:flex;gap:18px;align-items:center;flex-wrap:wrap}.pie-svg{width:190px;height:190px;flex:none}.pie-leg{flex:1;min-width:160px}.pie-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px}
-
-/* observações, transferências e financiamento */
-.lt-note{margin-top:4px;font-size:12px;color:var(--muted);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.lt-row.xf{border-left-color:var(--muted);background:color-mix(in srgb,var(--mint) 55%,var(--white))}.lt-row.xf .lt-ico{background:var(--bg);color:var(--muted)}.lt-row.xf .lt-amt{color:var(--ink)}
-.vh-fin{background:var(--bg);border-radius:12px;padding:10px 12px;margin:8px 0}.vh-fin summary{cursor:pointer;list-style:none}.vh-fin summary::-webkit-details-marker{display:none}.vh-fin summary::after{content:' ▾';color:var(--muted)}.vh-fin[open] summary{margin-bottom:8px}

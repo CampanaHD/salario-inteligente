@@ -17,3 +17,11 @@ Sistema de finanças pessoais (HTML + JavaScript + Supabase).
 - **Temas completos** (claro/escuro e sete paletas) e **app instalável** no celular.
 
 Teclas: `N` novo lançamento, `Ctrl + K` busca.
+
+## Melhorias recentes de investimentos, lançamentos e cartões
+- **Investimentos:** edição de ativos já cadastrados; ao salvar, o lançamento de aplicação vinculado é atualizado junto ou removido se o débito for desativado.
+- **Lançamentos:** seleção de conta diretamente no formulário e divisão do pagamento em duas ou mais contas, com valores individuais e validação do total antes de salvar.
+- **Cartões:** edição de compras, recálculo das parcelas e formulário de pagamento de fatura sem caixas de alerta; o pagamento aceita quantas contas forem necessárias.
+- **Conciliação:** cada conta usada no pagamento da fatura recebe seu débito; o pagamento também aparece em Lançamentos como movimentação de transferência, sem duplicar a despesa original.
+
+Essas melhorias usam as tabelas e colunas já presentes na versão Plus (`investments`, `transactions`, `card_purchases` e `account_transfers`). Não há uma nova migração SQL específica para esta atualização. Faça backup antes de substituir os arquivos publicados.

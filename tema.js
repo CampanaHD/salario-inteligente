@@ -6,8 +6,3 @@ document.querySelectorAll('.nav-section').forEach((d,i)=>{const k='si_nav'+i,v=l
 /* Garante que contas, benefícios, pontos e veículos carreguem na abertura: se o primeiro carregamento
    aconteceu antes dos módulos extras ficarem prontos, recarrega uma vez e redesenha a tela. */
 (function(){let kicked=false;const _r=renderPage;renderPage=function(){_r();if(!kicked&&!window.__ext&&typeof user!=='undefined'&&user){kicked=true;Promise.resolve(loadData()).then(()=>renderPage()).catch(()=>{})}}})();
-
-/* Categorias unificadas: todos os campos de categoria usam a mesma lista (e mantêm o valor atual, mesmo antigo) */
-(function(){const L=['Alimentação','Moradia','Transporte','Saúde','Lazer','Educação','Salário','Contas','Veículos','Cartão de Crédito','Assinaturas','Terceiros','Pessoal','Benefícios','Hora extra','Outros'];let busy=false;
-  function fix(){if(busy)return;busy=true;try{document.querySelectorAll('select[id*="ategor"]').forEach(s=>{const cur=s.value,want=[...L];if(cur&&!want.includes(cur))want.push(cur);const have=[...s.options].map(o=>o.textContent);if(have.length===want.length&&have.every((x,i)=>x===want[i]))return;s.innerHTML=want.map(x=>`<option>${x}</option>`).join('');if(cur)s.value=cur})}finally{busy=false}}
-  new MutationObserver(()=>fix()).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['open']});fix()})();
