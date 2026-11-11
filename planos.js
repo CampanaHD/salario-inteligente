@@ -7,7 +7,7 @@ const PLAN_CONFIG={
   /* Cole aqui os links de pagamento (Mercado Pago, Stripe, Kiwify etc.). Vazio = mostra aviso. */
   checkout:{individual:'',family:''},
   /* Opcional: link de contato para pedir a assinatura, ex.: 'https://wa.me/5514999999999' */
-  contato:''
+  contato:'https://wa.me/5514996953220'
 };
 const RANK={free:0,individual:1,family:2};
 const PLANS={
