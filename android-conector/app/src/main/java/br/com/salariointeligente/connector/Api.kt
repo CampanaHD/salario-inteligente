@@ -22,10 +22,25 @@ object Api {
         if (json.has("error")) throw IllegalStateException(json.getString("error"))
         return json
     }
-    fun pair(code: String): String {
-        val result = post(JSONObject().put("action", "pair").put("pair_code", code.trim()))
-        return result.getString("device_token")
+    
+fun pair(code: String): String {
+    val result = post(
+        JSONObject()
+            .put("action", "pair")
+            .put("pair_code", code.trim())
+    )
+
+    val token = result.optString("device_token", "")
+
+    if (token.isBlank()) {
+        throw IllegalStateException(
+            "O servidor não retornou device_token. Resposta recebida: $result"
+        )
     }
+
+    return token
+}
+
     fun sync(token: String, event: JSONObject) {
         post(JSONObject().put("action", "sync").put("device_token", token).put("events", JSONArray().put(event)))
     }
