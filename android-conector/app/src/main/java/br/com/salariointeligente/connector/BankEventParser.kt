@@ -14,6 +14,32 @@ object BankEventParser {
         "com.bradesco" to "Bradesco", "com.santander.app" to "Santander", "com.itau" to "Itaú"
     )
     private val amountRegex = Regex("(?i)R\\$[\\s\\u00A0]*([0-9.]+,[0-9]{2})|([0-9.]+,[0-9]{2})[\\s\\u00A0]*reais")
+    fun isBankPackage(packageName: String): Boolean = bankPackages.containsKey(packageName)
+
+    private val movementWords = listOf(
+        "pix", "compra", "debito", "transferencia", "transferiu", "ted", "recebeu", "recebido",
+        "recebimento", "pagamento", "deposito", "enviou"
+    )
+    private val incomePhrases = listOf(
+        "recebimento", "voce recebeu", "te enviou", "te transferiu", "pix recebido",
+        "transferencia recebida", "caiu na sua conta"
+    )
+    private val strongExpensePhrases = listOf(
+        "voce enviou", "voce fez um pix", "voce transferiu", "pix enviado", "transferencia enviada",
+        "compra aprovada", "compra no debito", "debito realizado", "pagamento realizado", "pagamento efetuado"
+    )
+
+    /** Motivo (sem o texto da notificação) pelo qual uma notificação de banco não virou lançamento. */
+    fun rejectionReason(packageName: String, text: String): String {
+        if (!bankPackages.containsKey(packageName)) return "aplicativo não é um banco mapeado"
+        val clean = text.replace(Regex("\\s+"), " ").trim()
+        if (clean.length > 1000) return "texto longo demais"
+        val n = normalized(clean)
+        if (!movementWords.any { n.contains(it) }) return "sem palavra de movimentação (Pix, compra, transferência...)"
+        if (parseAmount(clean) == null) return "sem valor em reais no texto"
+        return "não ficou claro se é entrada ou saída"
+    }
+
     private fun normalized(s: String) = Normalizer.normalize(s.lowercase(Locale("pt", "BR")), Normalizer.Form.NFD).replace(Regex("\\p{Mn}+"), "")
     private fun parseAmount(text: String): Double? {
         val m = amountRegex.find(text) ?: return null
@@ -25,20 +51,24 @@ object BankEventParser {
         val clean = text.replace(Regex("\\s+"), " ").trim()
         if (clean.isBlank() || clean.length > 1000) return null
         val n = normalized(clean)
-        val hasMoneyMovement = listOf("pix", "compra", "debito", "transferencia", "ted", "recebeu", "recebido", "pagamento", "deposito").any { n.contains(it) }
+        val hasMoneyMovement = movementWords.any { n.contains(it) }
         if (!hasMoneyMovement) return null
         val amount = parseAmount(clean) ?: return null
         if (amount <= 0.0) return null
         // Bancos variam a ordem das palavras: "Pix recebido", "Você recebeu um Pix",
         // "Pix de ... recebido". Considere também verbos de crédito/débito.
-        val income = (
-            (n.contains("pix") || n.contains("transferencia") || n.contains("ted") || n.contains("deposito")) &&
-                listOf("receb", "credit", "entrada").any { n.contains(it) }
-            ) || listOf("recebimento", "voce recebeu").any { n.contains(it) }
-        val expense = (
-            (n.contains("pix") || n.contains("transferencia") || n.contains("ted")) &&
-                listOf("enviad", "debitad").any { n.contains(it) }
-            ) || listOf("voce fez um pix", "voce enviou", "compra aprovada", "compra no debito", "debito realizado", "pagamento realizado", "pagamento efetuado").any { n.contains(it) } ||
+        val strongExpense = strongExpensePhrases.any { n.contains(it) }
+        val income = !strongExpense && (
+            (
+                (n.contains("pix") || n.contains("transferencia") || n.contains("ted") || n.contains("deposito")) &&
+                    listOf("receb", "credit", "entrada").any { n.contains(it) }
+                ) ||
+                incomePhrases.any { n.contains(it) } ||
+                ((n.contains("transferiu") || n.contains("enviou")) && n.contains("para voce"))
+            )
+        val expense = strongExpense ||
+            ((n.contains("pix") || n.contains("transferencia") || n.contains("ted")) &&
+                listOf("enviad", "debitad").any { n.contains(it) }) ||
             ((n.contains("pix") || n.contains("transferencia")) && listOf("realizad", "concluid", "feito").any { n.contains(it) })
         if (!income && !expense) return null
         val date = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date(postedAt))

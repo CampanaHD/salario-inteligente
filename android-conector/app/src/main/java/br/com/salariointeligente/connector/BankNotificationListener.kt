@@ -17,6 +17,9 @@ class BankNotificationListener : NotificationListenerService() {
         const val PREF_LAST_NOTIFICATION_PACKAGE = "last_notification_package"
         const val PREF_NOTIFICATIONS_SEEN = "notifications_seen"
         const val PREF_EVENTS_DETECTED = "events_detected"
+        const val PREF_LAST_BANK_AT = "last_bank_at"
+        const val PREF_LAST_BANK_PACKAGE = "last_bank_package"
+        const val PREF_LAST_BANK_RESULT = "last_bank_result"
     }
 
     override fun onListenerConnected() {
@@ -70,25 +73,39 @@ class BankNotificationListener : NotificationListenerService() {
 
             Log.i(TAG, "Notificação ${if (fromHistory) "ativa/histórica" else "NOVA"}: pacote=${sbn.packageName}, chave=${sbn.key}, horário=${sbn.postTime}")
 
+            val isBank = BankEventParser.isBankPackage(sbn.packageName)
+            fun markBank(result: String) {
+                if (!isBank) return
+                prefs.edit()
+                    .putLong(PREF_LAST_BANK_AT, System.currentTimeMillis())
+                    .putString(PREF_LAST_BANK_PACKAGE, sbn.packageName)
+                    .putString(PREF_LAST_BANK_RESULT, result)
+                    .apply()
+            }
+
             val token = prefs.getString(ConnectorConfig.DEVICE_TOKEN, null)
             if (token.isNullOrBlank()) {
+                markBank("celular ainda não vinculado ao site")
                 Log.w(TAG, "Notificação recebida, mas este celular ainda não está vinculado")
                 return
             }
 
             val text = extractNotificationText(sbn)
             if (text.isBlank()) {
+                markBank("notificação sem texto legível")
                 Log.d(TAG, "Notificação sem texto legível; extras=${sbn.notification.extras?.keySet()?.joinToString()}")
                 return
             }
 
             val event = BankEventParser.parse(sbn.packageName, text, sbn.key, sbn.postTime)
             if (event == null) {
+                markBank("não reconhecida: " + BankEventParser.rejectionReason(sbn.packageName, text))
                 // Não registrar o conteúdo bancário nos logs; somente diagnóstico estrutural.
                 Log.d(TAG, "Não reconhecida: pacote=${sbn.packageName}, tamanho=${text.length}, extras=${sbn.notification.extras?.keySet()?.joinToString()}")
                 return
             }
 
+            markBank(if (event.optString("kind") == "income") "reconhecida como ENTRADA" else "reconhecida como SAÍDA")
             PendingSync.enqueue(this, event)
             prefs.edit().putInt(PREF_EVENTS_DETECTED, prefs.getInt(PREF_EVENTS_DETECTED, 0) + 1).apply()
             Log.i(TAG, "Movimentação identificada: ${event.optString("bank_name")} ${event.optString("kind")} · ${event.optString("amount")}")

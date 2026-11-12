@@ -15,7 +15,9 @@ object Api {
         conn.setRequestProperty("Content-Type", "application/json")
         conn.setRequestProperty("apikey", ConnectorConfig.SUPABASE_ANON_KEY)
         conn.outputStream.use { it.write(body.toString().toByteArray(Charsets.UTF_8)) }
-        val stream = if (conn.responseCode in 200..299) conn.inputStream else conn.errorStream
+        val code = conn.responseCode
+        val stream = (if (code in 200..299) conn.inputStream else conn.errorStream)
+            ?: throw IllegalStateException("Servidor respondeu HTTP $code sem conteúdo")
         val response = stream.bufferedReader().use { it.readText() }
         conn.disconnect()
         val json = JSONObject(response)

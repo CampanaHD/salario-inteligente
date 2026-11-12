@@ -10,6 +10,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.service.notification.NotificationListenerService
 import android.text.InputType
 import android.view.Gravity
 import android.view.View
@@ -24,6 +25,7 @@ import android.widget.Toast
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import java.util.concurrent.Executors
@@ -35,6 +37,7 @@ class MainActivity : Activity() {
 
     private lateinit var statusHost: LinearLayout
     private lateinit var lastNotification: TextView
+    private lateinit var diagnostics: TextView
     private lateinit var restrictedHelp: LinearLayout
     private lateinit var accessButton: Button
 
@@ -206,6 +209,20 @@ class MainActivity : Activity() {
         statusCard.addView(statusHost)
         lastNotification = label("", 12f, MUTED).apply { setPadding(0, dp(8), 0, 0) }
         statusCard.addView(lastNotification)
+        diagnostics = label("", 12f, MUTED).apply { setPadding(0, dp(6), 0, 0) }
+        statusCard.addView(diagnostics)
+        statusCard.addView(
+            secondaryButton("Enviar pendentes agora") {
+                WorkManager.getInstance(this).enqueue(
+                    OneTimeWorkRequestBuilder<SyncWorker>()
+                        .setConstraints(
+                            Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+                        )
+                        .build()
+                )
+                Toast.makeText(this, "Envio solicitado. Atualize a tela em alguns segundos.", Toast.LENGTH_SHORT).show()
+            }
+        )
         root.addView(statusCard)
 
         // Passo 1: vincular
@@ -282,6 +299,7 @@ class MainActivity : Activity() {
             addView(secondaryButton("Abrir informações do app") { openAppInfo() })
         }
         accessCard.addView(restrictedHelp)
+        accessCard.addView(secondaryButton("Evitar que o Android pause o app") { openBatterySettings() })
         root.addView(accessCard)
 
         // Rodapé
@@ -390,6 +408,16 @@ class MainActivity : Activity() {
         }
     }
 
+    /** Alguns celulares (Xiaomi, Samsung, Motorola) encerram apps em segundo plano e param de entregar notificações. */
+    private fun openBatterySettings() {
+        try {
+            startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
+            Toast.makeText(this, "Procure “Salário Inteligente Conector” e escolha “Sem restrições” ou “Não otimizar”.", Toast.LENGTH_LONG).show()
+        } catch (e: Exception) {
+            openAppInfo()
+        }
+    }
+
     private fun openAppInfo() {
         try {
             startActivity(
@@ -424,6 +452,35 @@ class MainActivity : Activity() {
         )
         statusHost.addView(statusRow("Notificações recebidas", seen.toString(), if (seen > 0) ACCENT else MUTED))
         statusHost.addView(statusRow("Movimentações identificadas", detected.toString(), if (detected > 0) ACCENT else MUTED))
+        val pending = PendingSync.snapshot(this).length()
+        statusHost.addView(statusRow("Aguardando envio ao site", pending.toString(), if (pending == 0) MUTED else WARN))
+
+        val timeFormat = java.text.DateFormat.getTimeInstance(java.text.DateFormat.SHORT)
+        val syncAt = prefs.getLong(SyncWorker.PREF_LAST_SYNC_AT, 0L)
+        val syncError = prefs.getString(SyncWorker.PREF_LAST_SYNC_ERROR, null)
+        val syncLine = when {
+            syncAt == 0L -> "Último envio ao site: nenhum ainda"
+            syncError != null -> "Último envio ao site FALHOU às ${timeFormat.format(java.util.Date(syncAt))}: $syncError"
+            else -> "Último envio ao site: ok às ${timeFormat.format(java.util.Date(syncAt))}"
+        }
+        val bankAt = prefs.getLong(BankNotificationListener.PREF_LAST_BANK_AT, 0L)
+        val bankLine = if (bankAt > 0L) {
+            "Última notificação de banco (${prefs.getString(BankNotificationListener.PREF_LAST_BANK_PACKAGE, "?")}) " +
+                "às ${timeFormat.format(java.util.Date(bankAt))}: ${prefs.getString(BankNotificationListener.PREF_LAST_BANK_RESULT, "?")}"
+        } else {
+            "Nenhuma notificação de banco chegou ainda (só contam bancos mapeados, como o Nubank)."
+        }
+        diagnostics.text = bankLine + "\n" + syncLine
+
+        if (enabled) {
+            try {
+                NotificationListenerService.requestRebind(
+                    ComponentName(this, BankNotificationListener::class.java)
+                )
+            } catch (e: Exception) {
+                // Sem ação: o Android religa o serviço sozinho na maioria dos casos.
+            }
+        }
 
         lastNotification.text = if (lastAt > 0L) {
             "Última notificação: ${lastPackage ?: "pacote desconhecido"} · " +
