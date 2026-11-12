@@ -13,7 +13,7 @@ object BankEventParser {
         "br.com.bb.android" to "Banco do Brasil", "br.gov.caixa" to "Caixa",
         "com.bradesco" to "Bradesco", "com.santander.app" to "Santander", "com.itau" to "Itaú"
     )
-    private val amountRegex = Regex("(?i)R\\$\\s*([0-9.]+,[0-9]{2})|([0-9.]+,[0-9]{2})\\s*reais")
+    private val amountRegex = Regex("(?i)R\\$[\\s\\u00A0]*([0-9.]+,[0-9]{2})|([0-9.]+,[0-9]{2})[\\s\\u00A0]*reais")
     private fun normalized(s: String) = Normalizer.normalize(s.lowercase(Locale("pt", "BR")), Normalizer.Form.NFD).replace(Regex("\\p{Mn}+"), "")
     private fun parseAmount(text: String): Double? {
         val m = amountRegex.find(text) ?: return null
@@ -29,8 +29,17 @@ object BankEventParser {
         if (!hasMoneyMovement) return null
         val amount = parseAmount(clean) ?: return null
         if (amount <= 0.0) return null
-        val income = listOf("pix recebido", "recebeu um pix", "recebimento", "transferencia recebida", "ted recebida", "deposito recebido", "voce recebeu").any { n.contains(it) }
-        val expense = listOf("pix enviado", "voce fez um pix", "compra aprovada", "compra no debito", "debito realizado", "pagamento realizado", "transferencia enviada", "pagamento efetuado").any { n.contains(it) }
+        // Bancos variam a ordem das palavras: "Pix recebido", "Você recebeu um Pix",
+        // "Pix de ... recebido". Considere também verbos de crédito/débito.
+        val income = (
+            (n.contains("pix") || n.contains("transferencia") || n.contains("ted") || n.contains("deposito")) &&
+                listOf("receb", "credit", "entrada").any { n.contains(it) }
+            ) || listOf("recebimento", "voce recebeu").any { n.contains(it) }
+        val expense = (
+            (n.contains("pix") || n.contains("transferencia") || n.contains("ted")) &&
+                listOf("enviad", "debitad").any { n.contains(it) }
+            ) || listOf("voce fez um pix", "voce enviou", "compra aprovada", "compra no debito", "debito realizado", "pagamento realizado", "pagamento efetuado").any { n.contains(it) } ||
+            ((n.contains("pix") || n.contains("transferencia")) && listOf("realizad", "concluid", "feito").any { n.contains(it) })
         if (!income && !expense) return null
         val date = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date(postedAt))
         val digest = MessageDigest.getInstance("SHA-256").digest("$packageName|$notificationKey|$clean".toByteArray())

@@ -1,4 +1,3 @@
-
 name: Build Android APK
 
 on:
@@ -8,8 +7,13 @@ on:
       - 'android-conector/**'
       - '.github/workflows/android-apk.yml'
 
+# Precisa de escrita para publicar o APK na pasta downloads/ do repositório.
 permissions:
-  contents: read
+  contents: write
+
+concurrency:
+  group: android-apk
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -42,20 +46,51 @@ jobs:
         with:
           gradle-version: '8.9'
 
-      - name: Compilar APK de teste
-        working-directory: android-conector
-        run: gradle --no-daemon assembleDebug
-
-      - name: Preparar arquivo para download
+      # Chave própria (opcional): cadastre os 4 secrets abaixo em Settings > Secrets and variables > Actions.
+      # Sem eles, a compilação usa a chave beta que acompanha o projeto (android-conector/app/beta.keystore).
+      - name: Preparar chave de assinatura própria (se existir)
+        env:
+          KS_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
         run: |
-          mkdir -p dist
-          cp android-conector/app/build/outputs/apk/debug/app-debug.apk \
-            dist/salario-inteligente-conector-debug.apk
+          if [ -n "$KS_B64" ]; then
+            echo "$KS_B64" | base64 -d > "$RUNNER_TEMP/release.keystore"
+            echo "ANDROID_KEYSTORE_FILE=$RUNNER_TEMP/release.keystore" >> "$GITHUB_ENV"
+            echo "ANDROID_KEYSTORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> "$GITHUB_ENV"
+            echo "ANDROID_KEY_ALIAS=${{ secrets.ANDROID_KEY_ALIAS }}" >> "$GITHUB_ENV"
+            echo "ANDROID_KEY_PASSWORD=${{ secrets.ANDROID_KEY_PASSWORD }}" >> "$GITHUB_ENV"
+            echo "Usando chave própria dos Secrets."
+          else
+            echo "Sem secrets de assinatura: usando a chave beta do projeto."
+          fi
 
-      - name: Publicar APK como artefato
+      - name: Compilar APK assinado
+        working-directory: android-conector
+        run: gradle --no-daemon assembleRelease
+
+      - name: Publicar APK e dados da versão em downloads/
+        run: |
+          APK=android-conector/app/build/outputs/apk/release/app-release.apk
+          test -f "$APK"
+          mkdir -p downloads
+          cp "$APK" downloads/salario-inteligente-conector.apk
+          VERSION=$(grep -oP "versionName '\K[^']+" android-conector/app/build.gradle)
+          CODE=$(grep -oP "versionCode \K[0-9]+" android-conector/app/build.gradle)
+          SIZE=$(stat -c%s downloads/salario-inteligente-conector.apk)
+          SHA=$(sha256sum downloads/salario-inteligente-conector.apk | cut -d' ' -f1)
+          printf '{"version":"%s","versionCode":%s,"size":%s,"sha256":"%s","builtAt":"%s"}\n' \
+            "$VERSION" "$CODE" "$SIZE" "$SHA" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > downloads/conector.json
+          cat downloads/conector.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add downloads
+          git commit -m "Atualiza APK do Conector (${VERSION})" || echo "Nada para commitar"
+          git pull --rebase origin "${GITHUB_REF_NAME}" || true
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+
+      - name: Guardar cópia como artefato
         uses: actions/upload-artifact@v4
         with:
           name: salario-inteligente-conector-apk
-          path: dist/salario-inteligente-conector-debug.apk
+          path: downloads/salario-inteligente-conector.apk
           if-no-files-found: error
           retention-days: 30

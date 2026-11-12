@@ -1,6 +1,7 @@
-
 package br.com.salariointeligente.connector
 
+import android.app.Notification
+import android.os.Bundle
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
@@ -10,101 +11,95 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 
 class BankNotificationListener : NotificationListenerService() {
-
     companion object {
         private const val TAG = "SI_CONNECTOR"
+        const val PREF_LAST_NOTIFICATION_AT = "last_notification_at"
+        const val PREF_LAST_NOTIFICATION_PACKAGE = "last_notification_package"
+        const val PREF_NOTIFICATIONS_SEEN = "notifications_seen"
+        const val PREF_EVENTS_DETECTED = "events_detected"
     }
 
     override fun onListenerConnected() {
         super.onListenerConnected()
-
-        Log.i(TAG, "Serviço de notificações conectado!")
-
-        // Tenta processar notificações que ainda estão visíveis
-        // na central de notificações do Android.
+        Log.i(TAG, "Listener conectado; aguardando notificações novas em tempo real.")
+        // O Android pode entregar notificações que já estavam na central ao conectar.
+        // Isso serve para recuperar eventos pendentes, mas não comprova captura em tempo real.
         try {
-            activeNotifications?.forEach { sbn ->
-                processNotification(sbn)
-            }
+            activeNotifications?.forEach { sbn -> processNotification(sbn, fromHistory = true) }
         } catch (e: Exception) {
-            Log.e(TAG, "Erro ao verificar notificações ativas", e)
+            Log.e(TAG, "Erro ao verificar notificações ainda ativas", e)
         }
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
-        processNotification(sbn)
+        processNotification(sbn, fromHistory = false)
     }
 
-    private fun processNotification(sbn: StatusBarNotification) {
-        try {
-            val token = getSharedPreferences(
-                ConnectorConfig.PREFS,
-                MODE_PRIVATE
-            ).getString(ConnectorConfig.DEVICE_TOKEN, null)
+    private fun extractNotificationText(sbn: StatusBarNotification): String {
+        val extras = sbn.notification.extras ?: Bundle()
+        val parts = mutableListOf<String>()
+        fun add(value: CharSequence?) {
+            val text = value?.toString()?.trim().orEmpty()
+            if (text.isNotBlank() && text !in parts) parts.add(text)
+        }
+        add(extras.getCharSequence(Notification.EXTRA_TITLE))
+        add(extras.getCharSequence(Notification.EXTRA_TEXT))
+        add(extras.getCharSequence(Notification.EXTRA_BIG_TEXT))
+        add(extras.getCharSequence(Notification.EXTRA_SUB_TEXT))
+        add(extras.getCharSequence(Notification.EXTRA_INFO_TEXT))
+        add(extras.getCharSequence(Notification.EXTRA_SUMMARY_TEXT))
+        add(sbn.notification.tickerText)
+        extras.getCharSequenceArray(Notification.EXTRA_TEXT_LINES)?.forEach { add(it) }
 
+        // Alguns bancos usam notificações no formato MessagingStyle.
+        extras.getParcelableArray(Notification.EXTRA_MESSAGES)?.forEach { item ->
+            val message = item as? Bundle
+            add(message?.getCharSequence("text"))
+        }
+        return parts.joinToString(" — ").replace(Regex("\\s+"), " ").take(2000)
+    }
+
+    private fun processNotification(sbn: StatusBarNotification, fromHistory: Boolean) {
+        try {
+            val prefs = getSharedPreferences(ConnectorConfig.PREFS, MODE_PRIVATE)
+            prefs.edit()
+                .putLong(PREF_LAST_NOTIFICATION_AT, System.currentTimeMillis())
+                .putString(PREF_LAST_NOTIFICATION_PACKAGE, sbn.packageName)
+                .putInt(PREF_NOTIFICATIONS_SEEN, prefs.getInt(PREF_NOTIFICATIONS_SEEN, 0) + 1)
+                .apply()
+
+            Log.i(TAG, "Notificação ${if (fromHistory) "ativa/histórica" else "NOVA"}: pacote=${sbn.packageName}, chave=${sbn.key}, horário=${sbn.postTime}")
+
+            val token = prefs.getString(ConnectorConfig.DEVICE_TOKEN, null)
             if (token.isNullOrBlank()) {
-                Log.w(TAG, "Dispositivo ainda não está vinculado")
+                Log.w(TAG, "Notificação recebida, mas este celular ainda não está vinculado")
                 return
             }
 
-            val extras = sbn.notification.extras
+            val text = extractNotificationText(sbn)
+            if (text.isBlank()) {
+                Log.d(TAG, "Notificação sem texto legível; extras=${sbn.notification.extras?.keySet()?.joinToString()}")
+                return
+            }
 
-            val title = extras
-                .getCharSequence("android.title")
-                ?.toString()
-                .orEmpty()
-
-            val bigText = extras
-                .getCharSequence("android.bigText")
-                ?.toString()
-                .orEmpty()
-
-            val normalText = extras
-                .getCharSequence("android.text")
-                ?.toString()
-                .orEmpty()
-
-            // Se bigText estiver vazio, utiliza android.text.
-            val body = bigText.ifBlank { normalText }
-
-            val text = listOf(title, body)
-                .filter { it.isNotBlank() }
-                .joinToString(" — ")
-
-            Log.d(TAG, "Notificação recebida do pacote: ${sbn.packageName}")
-
-            val event = BankEventParser.parse(
-                sbn.packageName,
-                text,
-                sbn.key,
-                sbn.postTime
-            )
-
+            val event = BankEventParser.parse(sbn.packageName, text, sbn.key, sbn.postTime)
             if (event == null) {
-                Log.d(TAG, "Notificação recebida, mas não reconhecida pelo parser")
+                // Não registrar o conteúdo bancário nos logs; somente diagnóstico estrutural.
+                Log.d(TAG, "Não reconhecida: pacote=${sbn.packageName}, tamanho=${text.length}, extras=${sbn.notification.extras?.keySet()?.joinToString()}")
                 return
             }
 
             PendingSync.enqueue(this, event)
-
-            Log.i(
-                TAG,
-                "Movimentação reconhecida: ${event.optString("bank_name")} " +
-                    "${event.optString("kind")} - ${event.optString("amount")}"
-            )
+            prefs.edit().putInt(PREF_EVENTS_DETECTED, prefs.getInt(PREF_EVENTS_DETECTED, 0) + 1).apply()
+            Log.i(TAG, "Movimentação identificada: ${event.optString("bank_name")} ${event.optString("kind")} · ${event.optString("amount")}")
 
             val constraints = Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .build()
-
             val request = OneTimeWorkRequestBuilder<SyncWorker>()
                 .setConstraints(constraints)
                 .build()
-
             WorkManager.getInstance(this).enqueue(request)
-
-            Log.d(TAG, "Sincronização agendada")
-
         } catch (e: Exception) {
             Log.e(TAG, "Erro ao processar notificação", e)
         }

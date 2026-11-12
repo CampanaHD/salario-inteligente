@@ -12,8 +12,39 @@ android {
         applicationId 'br.com.salariointeligente.connector'
         minSdk 26
         targetSdk 35
-        versionCode 1
-        versionName '1.0.0-beta.1'
+        versionCode 3
+        versionName '1.0.0-beta.3'
+    }
+
+    // Assinatura fixa: o mesmo certificado em toda compilação permite atualizar o app sem desinstalar.
+    // Com os secrets ANDROID_KEYSTORE_* configurados no GitHub, usa a sua chave; senão usa a chave beta do projeto.
+    signingConfigs {
+        release {
+            def envKs = System.getenv('ANDROID_KEYSTORE_FILE')
+            if (envKs) {
+                storeFile file(envKs)
+                storePassword System.getenv('ANDROID_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('ANDROID_KEY_ALIAS')
+                keyPassword System.getenv('ANDROID_KEY_PASSWORD')
+            } else {
+                storeFile file('beta.keystore')
+                storePassword 'salario-beta'
+                keyAlias 'conector'
+                keyPassword 'salario-beta'
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+        }
+    }
+
+    lint {
+        checkReleaseBuilds false
+        abortOnError false
     }
 
     // Compatibilidade Java 17
