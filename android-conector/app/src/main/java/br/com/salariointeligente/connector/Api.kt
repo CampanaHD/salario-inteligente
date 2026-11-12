@@ -34,7 +34,7 @@ fun pair(code: String): String {
 
     if (token.isBlank()) {
         throw IllegalStateException(
-            "O servidor não retornou device_token. Resposta recebida: $result"
+            "Resposta inesperada do servidor: $result"
         )
     }
 
@@ -42,6 +42,24 @@ fun pair(code: String): String {
 }
 
     fun sync(token: String, event: JSONObject) {
-        post(JSONObject().put("action", "sync").put("device_token", token).put("events", JSONArray().put(event)))
+    val result = post(
+        JSONObject()
+            .put("action", "sync")
+            .put("device_token", token)
+            .put("events", JSONArray().put(event))
+    )
+
+    val accepted = result.optInt("accepted", 0)
+
+    if (accepted == 0) {
+        throw IllegalStateException(
+            "Servidor recebeu, mas rejeitou a movimentação: $result"
+        )
     }
+
+    android.util.Log.d(
+        "SI_CONNECTOR",
+        "Movimentação aceita pelo servidor: $result"
+    )
+}
 }
