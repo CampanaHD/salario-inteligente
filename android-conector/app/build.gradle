@@ -1,3 +1,4 @@
+
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
@@ -6,12 +7,26 @@ plugins {
 android {
     namespace 'br.com.salariointeligente.connector'
     compileSdk 35
+
     defaultConfig {
         applicationId 'br.com.salariointeligente.connector'
         minSdk 26
         targetSdk 35
         versionCode 1
         versionName '1.0.0-beta.1'
+    }
+
+    // Compatibilidade Java 17
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+// Compatibilidade Kotlin 17
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+    kotlinOptions {
+        jvmTarget = '17'
     }
 }
 
