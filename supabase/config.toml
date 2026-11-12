@@ -1,0 +1,4 @@
+[functions.bank-connector]
+# O endpoint usa códigos de pareamento e tokens próprios de dispositivo.
+# A função valida esses segredos antes de aceitar qualquer movimentação.
+verify_jwt = false

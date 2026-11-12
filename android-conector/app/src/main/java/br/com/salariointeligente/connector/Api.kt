@@ -1,0 +1,32 @@
+package br.com.salariointeligente.connector
+
+import org.json.JSONArray
+import org.json.JSONObject
+import java.net.HttpURLConnection
+import java.net.URL
+
+object Api {
+    private fun post(body: JSONObject): JSONObject {
+        val conn = (URL(ConnectorConfig.FUNCTION_URL).openConnection() as HttpURLConnection)
+        conn.requestMethod = "POST"
+        conn.connectTimeout = 15000
+        conn.readTimeout = 15000
+        conn.doOutput = true
+        conn.setRequestProperty("Content-Type", "application/json")
+        conn.setRequestProperty("apikey", ConnectorConfig.SUPABASE_ANON_KEY)
+        conn.outputStream.use { it.write(body.toString().toByteArray(Charsets.UTF_8)) }
+        val stream = if (conn.responseCode in 200..299) conn.inputStream else conn.errorStream
+        val response = stream.bufferedReader().use { it.readText() }
+        conn.disconnect()
+        val json = JSONObject(response)
+        if (json.has("error")) throw IllegalStateException(json.getString("error"))
+        return json
+    }
+    fun pair(code: String): String {
+        val result = post(JSONObject().put("action", "pair").put("pair_code", code.trim()))
+        return result.getString("device_token")
+    }
+    fun sync(token: String, event: JSONObject) {
+        post(JSONObject().put("action", "sync").put("device_token", token).put("events", JSONArray().put(event)))
+    }
+}

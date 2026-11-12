@@ -35,3 +35,17 @@ Essas melhorias usam as tabelas e colunas já presentes na versão Plus (`invest
 Instalação: execute `planos.sql` no Supabase (uma vez) e publique `planos.js` e `planos.css` com os demais arquivos.
 Preços, textos e o que cada plano libera ficam no início de `planos.js`. Links de pagamento: `PLAN_CONFIG.checkout`.
 Para liberar um plano manualmente, use o comando comentado no final de `planos.sql`.
+
+## Conector bancário Android (beta privado)
+A aba **Integração bancária** permite parear um aplicativo Android que captura notificações bancárias autorizadas e importa movimentações para `transactions`.
+
+1. Execute `supabase-bank-connector.sql` no SQL Editor.
+2. Publique `supabase/functions/bank-connector` usando o Supabase CLI.
+3. Abra `android-conector` no Android Studio e gere um APK release assinado.
+4. Consulte `BANK-CONNECTOR-SETUP.md` e `android-conector/README.md` para configurar e testar.
+
+**Atenção:** o ZIP contém o código-fonte Android, não um APK compilado. O APK precisa ser gerado e assinado no Android Studio. A primeira versão importa apenas movimentações identificadas em notificações; não consulta saldo, fatura integral ou investimentos. Nubank é o primeiro alvo de teste; os demais bancos são experimentais.
+
+## Aplicativo Android Conector
+
+O projeto Android está em `android-conector/`. Para gerar um APK de teste sem Android Studio, envie o projeto ao GitHub e execute o workflow **Build Android APK** na aba Actions. O APK será disponibilizado como artefato para download por 30 dias. Consulte `android-conector/README.md` para configuração e limitações.
