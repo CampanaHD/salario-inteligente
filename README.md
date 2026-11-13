@@ -49,3 +49,11 @@ A aba **Integração bancária** permite parear um aplicativo Android que captur
 ## Aplicativo Android Conector
 
 O projeto Android está em `android-conector/`. Para gerar um APK de teste sem Android Studio, envie o projeto ao GitHub e execute o workflow **Build Android APK** na aba Actions. O APK será disponibilizado como artefato para download por 30 dias. Consulte `android-conector/README.md` para configuração e limitações.
+
+## Atualização de contas, financiamentos e atrasos
+
+Esta versão adiciona seleção da conta de origem ao pagar uma conta, divisão de lançamentos em até quatro contas, cadastro de financiamento de imóvel e IPTU anual, além de vencimento opcional em lançamentos.
+
+**Importante:** antes de publicar esta versão, execute `atualizacao-financiamentos-atrasos.sql` no SQL Editor do Supabase. A mesma migração também foi acrescentada ao final de `supabase-completo.sql`. Ela adiciona os campos de vencimento/encargos aos lançamentos e os campos de imóvel/parcelas às contas recorrentes.
+
+No pagamento de uma conta, o sistema calcula atraso, multa padrão de 2% e juros simples de 1% ao mês proporcional aos dias. Esses percentuais podem ser editados no próprio formulário e devem ser ajustados conforme o boleto/contrato.
