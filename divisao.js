@@ -35,6 +35,7 @@
   box.className = 'dv-pay'; box.id = 'dvPay';
   box.innerHTML =
     `<legend>Pagamento</legend>
+     <div class="dv-pay-intro">Escolha como pagou e de qual conta saiu o dinheiro.</div>
      <div class="dv-top" id="dvTop"></div>
      <div class="dv-single" id="dvSingle"></div>
      <label class="dv-switch" id="dvSwitchWrap">
@@ -42,8 +43,12 @@
        <span class="dv-switch-text"><b>Dividir entre contas</b><small>Pague uma parte em cada conta.</small></span>
      </label>
      <div class="dv-parts hidden" id="dvParts" aria-live="polite"></div>`;
-  box.querySelector('#dvTop').append(methodLabel, cardLabel);
-  box.querySelector('#dvSingle').append(accLabel, hint);
+  // A conta fica em destaque ao lado da forma de pagamento (não escondida no fim do formulário).
+  accLabel.querySelector('label,select')?.setAttribute('aria-label','Conta de origem');
+  accLabel.firstChild && (accLabel.firstChild.textContent = 'Conta de origem');
+  methodLabel.firstChild && (methodLabel.firstChild.textContent = 'Forma de pagamento');
+  box.querySelector('#dvTop').append(accLabel, methodLabel, cardLabel);
+  box.querySelector('#dvSingle').append(hint);
   wrap.textContent = '';
   wrap.append(dummy, legacy, box);
 
@@ -57,7 +62,8 @@
     switchWrap.classList.toggle('hidden', !ok);
     if (!ok && S.on) { S.on = false; toggle.checked = false; }
     parts.classList.toggle('hidden', !S.on);
-    $('dvSingle').classList.toggle('hidden', S.on || methodNow() === 'Crédito');
+    accLabel.classList.toggle('hidden', S.on || methodNow() === 'Crédito');
+    $('dvSingle').classList.toggle('hidden', methodNow() === 'Crédito');
     if (S.on) renderParts();
   }
 
@@ -173,6 +179,7 @@
     e.preventDefault();
     const id = $('transactionId').value, amount = Number($('txAmount').value), method = methodNow() || 'Débito', isPaid = $('txPaid').checked;
     const splitting = S.on && !id && isPaid && method !== 'Crédito';
+    if (isPaid && method !== 'Crédito' && window.CT?.ready?.() && !splitting && !$('txAccount')?.value) return toast('Selecione a conta de origem deste lançamento.');
     let list = [];
     if (splitting) {
       list = S.parts.map(p => ({account_id:p.acc, amount:p.c / 100}));
