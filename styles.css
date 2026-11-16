@@ -355,3 +355,11 @@ html,body{max-width:100%;overflow-x:hidden}img,svg,canvas{max-width:100%}
 .bill-pay-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0;padding:14px;border:1px solid var(--border,#dce5e1);border-radius:14px;background:var(--surface-2,rgba(120,140,130,.06))}
 .bill-pay-summary>div{display:flex;flex-direction:column;gap:4px}.bill-pay-summary span{font-size:.76rem;color:var(--muted)}.bill-pay-summary b{font-size:1rem}.bill-pay-summary .total{grid-column:1/-1;border-top:1px solid var(--border,#dce5e1);padding-top:10px;flex-direction:row;justify-content:space-between;align-items:center}.bill-pay-summary .total b{font-size:1.3rem}
 @media(max-width:600px){.tx-part-card{grid-template-columns:1fr}.bill-pay-summary{grid-template-columns:1fr 1fr}}
+
+/* Categorias personalizadas */
+.category-preset-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin:16px 0}
+.category-preset{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.category-preset span{display:flex;flex-direction:column;gap:3px}
+.category-preset small{color:var(--muted);font-size:12px}
+.category-settings .divider{height:1px;background:var(--line);margin:20px 0}
+.category-settings h3{margin:8px 0 12px}

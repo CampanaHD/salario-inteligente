@@ -57,3 +57,23 @@ Esta versão adiciona seleção da conta de origem ao pagar uma conta, divisão 
 **Importante:** antes de publicar esta versão, execute `atualizacao-financiamentos-atrasos.sql` no SQL Editor do Supabase. A mesma migração também foi acrescentada ao final de `supabase-completo.sql`. Ela adiciona os campos de vencimento/encargos aos lançamentos e os campos de imóvel/parcelas às contas recorrentes.
 
 No pagamento de uma conta, o sistema calcula atraso, multa padrão de 2% e juros simples de 1% ao mês proporcional aos dias. Esses percentuais podem ser editados no próprio formulário e devem ser ajustados conforme o boleto/contrato.
+
+
+## Atualização: formas de pagamento e categorias personalizadas
+
+Para ativar esta atualização, execute uma vez o arquivo `supabase-categorias-personalizadas.sql` no SQL Editor do Supabase. Ele cria os campos de subcategoria e forma de pagamento, salva as preferências de categorias por usuário e recupera a forma de pagamento dos lançamentos antigos de abastecimento quando ela estiver registrada nas observações.
+
+A tela Configurações agora permite ativar/desativar categorias prontas, adicionar categorias próprias e incluir subcategorias. As novas categorias são particulares de cada usuário. Em Lançamentos, a tabela exibe a forma de pagamento e a subcategoria. No abastecimento, a forma de pagamento é obrigatória e também é gravada no lançamento financeiro.
+
+
+## Categorias, subcategorias e divisão de pagamento (refino visual)
+- **Lançamentos:** categoria e subcategoria agora são escolhidas em chips coloridos, com ícone por categoria; a subcategoria pode ser criada ali mesmo (“＋ Nova”) e agora é realmente salva no lançamento.
+- **Configurações › Categorias e subcategorias:** cartões com interruptor para ativar/desativar, busca, subcategorias visíveis ao expandir, remoção das subcategorias e categorias próprias, e criação de categoria com ícone.
+- **Divisão de pagamento:** seção “Pagamento” única (forma, cartão, conta); “Dividir entre contas” aceita 2 a 4 contas, com botão “Completar”, “Dividir igualmente”, saldo de cada conta, barra de progresso e conferência do total. Cada parte vira um lançamento marcado como “Dividido 1/2”.
+- **Pagamento de fatura:** mesmas melhorias (valor já preenchido, “Completar”, conta ainda não usada e barra de progresso).
+- Arquivos novos: `divisao.js` e `refino.css`; `categorias.js` foi reescrito. Para a subcategoria ser gravada, o banco precisa ter executado `supabase-categorias-personalizadas.sql`.
+
+
+## Atualização: Vale combustível e km diário
+
+Para habilitar o novo benefício **Vale combustível** e o registro de quilometragem pela manhã/noite, execute `ATUALIZACAO-VALE-COMBUSTIVEL-KM.sql` no SQL Editor do Supabase. Depois publique os arquivos atualizados do projeto. Na aba **Contas bancárias**, cadastre o benefício **Vale combustível** e informe o saldo atual; nos abastecimentos, selecione essa conta para que a despesa seja debitada dela. Lançamentos antigos identificados como pagamento por Vale combustível serão vinculados automaticamente a essa conta quando o sistema carregar.
