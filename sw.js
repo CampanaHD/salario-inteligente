@@ -1,5 +1,5 @@
 /* Service worker: abre o app mesmo sem rede (rede primeiro, cache como reserva). Dados do banco nunca são cacheados. */
-const C='si-v1';
+const C='si-v3';
 self.addEventListener('install',()=>self.skipWaiting());
 self.addEventListener('activate',e=>e.waitUntil(self.clients.claim()));
 self.addEventListener('fetch',e=>{const r=e.request;if(r.method!=='GET'||new URL(r.url).origin!==location.origin)return;

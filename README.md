@@ -77,3 +77,11 @@ A tela Configurações agora permite ativar/desativar categorias prontas, adicio
 ## Atualização: Vale combustível e km diário
 
 Para habilitar o novo benefício **Vale combustível** e o registro de quilometragem pela manhã/noite, execute `ATUALIZACAO-VALE-COMBUSTIVEL-KM.sql` no SQL Editor do Supabase. Depois publique os arquivos atualizados do projeto. Na aba **Contas bancárias**, cadastre o benefício **Vale combustível** e informe o saldo atual; nos abastecimentos, selecione essa conta para que a despesa seja debitada dela. Lançamentos antigos identificados como pagamento por Vale combustível serão vinculados automaticamente a essa conta quando o sistema carregar.
+
+## Atualização — Calendário financeiro e previsão de combustível
+
+- Nova aba **Calendário financeiro**, com visão mensal, navegação entre meses, seleção de dias e agenda de receitas, despesas e vencimentos recorrentes.
+- Resumo mensal de receitas, despesas lançadas, contas previstas e saldo projetado.
+- Previsão de combustível por veículo: custo diário, projeção de 30 dias e estimativa de dias até o próximo abastecimento.
+- As previsões utilizam os abastecimentos, os intervalos entre tanques cheios, a capacidade cadastrada e os registros diários de quilometragem. Sem histórico suficiente, o sistema informa que ainda não pode estimar.
+- Não exige nova tabela SQL: utiliza os lançamentos, contas, abastecimentos e registros diários já existentes.
