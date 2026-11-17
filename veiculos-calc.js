@@ -28,6 +28,7 @@
   const read = (k, def) => { try { return { ...def, ...JSON.parse(localStorage.getItem(k) || '{}') }; } catch (e) { return { ...def }; } };
   const write = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* ignora */ } };
   const S = read(SK, { veh: '', period: 30, mode: 'week', zero: false, kmode: 'odo' });
+  let editingTripId = null;
   const P = read(PK, {});
   const persist = () => write(SK, S);
 
@@ -259,6 +260,20 @@
     return `<div class="table-wrap"><table><thead><tr><th>Data</th><th>Dia</th><th>Manhã</th><th>Noite</th><th>Rodado</th><th></th></tr></thead><tbody>${rows.map(x => `<tr><td>${dateBR(x.log_date)}</td><td>${WS[parse(x.log_date).getDay()]}</td><td>${N(x.morning_odometer, 1)} km</td><td>${N(x.evening_odometer, 1)} km</td><td><b>${N(x.km_driven, 1)} km</b></td><td class="vk-acts"><button class="mini-btn" data-vk-edit="${x.log_date}">Editar</button><button class="mini-btn danger" data-vk-del="${x.id}">Excluir</button></td></tr>`).join('')}</tbody></table></div>`;
   }
 
+  function tripsHTML(v, p) {
+    const rows = VH.trips().filter(t => t.vehicle_id === v.id).sort((a,b) => (b.trip_date||'').localeCompare(a.trip_date||'') || (b.departure_time||'').localeCompare(a.departure_time||''));
+    if (!rows.length) return '<p class="muted">Nenhum deslocamento registrado ainda.</p>';
+    const kmOf=t=>t.km_driven!=null?Number(t.km_driven):(t.start_odometer!=null&&t.end_odometer!=null?Math.max(0,Number(t.end_odometer)-Number(t.start_odometer)):0);
+    const fuel=t=>cost(kmOf(t),p)||0, extra=t=>Number(t.extra_cost||0);
+    const totalKm=sumBy(rows,kmOf), totalFuel=sumBy(rows,fuel), totalExtra=sumBy(rows,extra);
+    const days={}; rows.forEach(t=>{const d=t.trip_date;days[d]??={date:d,count:0,km:0,fuel:0,extra:0};days[d].count++;days[d].km+=kmOf(t);days[d].fuel+=fuel(t);days[d].extra+=extra(t)});
+    const daily=Object.values(days).sort((a,b)=>b.date.localeCompare(a.date));
+    const tile=(a,b,s='')=>`<div class="vh-tile"><small>${a}</small><b>${b}</b><span>${s}</span></div>`;
+    const trs=rows.map(t=>{const k=kmOf(t),f=fuel(t);return `<tr><td>${dateBR(t.trip_date)}<br><small>${t.departure_time||'—'}${t.arrival_time?' – '+t.arrival_time:''}</small></td><td>${esc(t.origin||'—')} → ${esc(t.destination||'—')}</td><td>${k?KM(k):'—'}</td><td>${k?R(f):'—'}</td><td>${extra(t)?R(extra(t)):'—'}</td><td><b>${k||extra(t)?R(f+extra(t)):'—'}</b></td><td><button class="mini-btn" data-vkt-edit="${t.id}">Editar</button><button class="mini-btn danger" data-vkt-del="${t.id}">Excluir</button></td></tr>`}).join('');
+    const daysRows=daily.map(d=>`<tr><td>${dateBR(d.date)}</td><td>${d.count}</td><td>${KM(d.km)}</td><td>${R(d.fuel)}</td><td>${R(d.extra)}</td><td><b>${R(d.fuel+d.extra)}</b></td></tr>`).join('');
+    return `<div class="vh-calc">${tile('Deslocamentos',rows.length,'no histórico')}${tile('Distância total',KM(totalKm),'soma dos trechos')}${tile('Combustível estimado',R(totalFuel),'consumo configurado')}${tile('Gastos extras',R(totalExtra),'informados manualmente')}${tile('Custo total estimado',R(totalFuel+totalExtra),'combustível + extras')}</div><h4 class="vk-h">Comparação por dia</h4><div class="table-wrap"><table><thead><tr><th>Dia</th><th>Trechos</th><th>KM</th><th>Combustível</th><th>Extras</th><th>Total</th></tr></thead><tbody>${daysRows}</tbody></table></div><h4 class="vk-h">Todos os deslocamentos</h4><div class="table-wrap"><table><thead><tr><th>Data / horário</th><th>Trecho</th><th>KM</th><th>Combustível</th><th>Extra</th><th>Total</th><th></th></tr></thead><tbody>${trs}</tbody></table></div>`;
+  }
+
   function html() {
     const vs = VH.act();
     if (!vs.length) return empty('Cadastre um veículo para usar a calculadora.');
@@ -297,6 +312,28 @@
             <label class="vk-only ${S.kmode === 'km' ? '' : 'hidden'}">Km rodados no dia<input id="vkKmIn" type="number" step="0.1" min="0" inputmode="decimal" placeholder="Ex.: 52"></label>
             <label>Observação (opcional)<input id="vkNotes" placeholder="Ex.: viagem, trânsito"></label>
           </div>
+          <div class="vk-live" style="margin-top:14px"><b>Deslocamentos deste dia</b><p class="muted">Registre vários trechos independentes. Salvar os KM do dia não substitui nem apaga os trajetos.</p></div>
+          <details class="vk-det" style="margin-top:10px" open>
+            <summary><b>+ Adicionar deslocamento</b> <small class="muted">— todos os campos são opcionais</small></summary>
+            ${VH.tripsReady() ? '' : '<div class="vh-alert late"><b>Ative o diário de deslocamentos</b><span>Execute ATUALIZACAO-TRAJETOS-VEICULOS.sql no Supabase.</span></div>'}
+            <div class="form-grid" style="margin-top:12px">
+              <label>Origem<select id="vktFrom"><option value="">Selecionar local (opcional)</option></select></label>
+              <label>Destino<select id="vktTo"><option value="">Selecionar local (opcional)</option></select></label>
+              <label>Ou digite origem<input id="vktFromNew" placeholder="Ex.: Casa"></label>
+              <label>Ou digite destino<input id="vktToNew" placeholder="Ex.: Serviço da namorada"></label>
+              <label>Horário de saída<input id="vktOut" type="time"></label>
+              <label>Horário de chegada<input id="vktIn" type="time"></label>
+              <label>KM inicial do trecho<input id="vktStart" type="number" min="0" step="0.1" placeholder="Opcional"></label>
+              <label>KM final do trecho<input id="vktEnd" type="number" min="0" step="0.1" placeholder="Opcional"></label>
+              <label>KM percorridos (alternativo)<input id="vktKm" type="number" min="0" step="0.1" placeholder="Opcional"></label>
+              <label>Gasto extra (R$)<input id="vktExtra" type="number" min="0" step="0.01" placeholder="Almoço, pedágio etc."></label>
+              <label style="grid-column:1/-1">Observação<input id="vktNote" placeholder="Opcional"></label>
+            </div>
+            <label class="checkline" style="margin-top:8px"><input id="vktSavePlaces" type="checkbox" checked> Salvar novos locais para usar novamente</label>
+            <div class="vk-live" id="vktPreview">Preencha os dados que desejar e adicione o trecho ao dia.</div>
+            <div class="vk-trip-actions"><button class="btn primary" type="button" id="vktAdd" ${VH.tripsReady() ? '' : 'disabled'}>Adicionar deslocamento ao dia</button><button class="btn ghost hidden" type="button" id="vktCancelEdit">Cancelar edição</button></div>
+          </details>
+          <div class="vh-card" style="margin-top:12px"><h4 class="vk-h">Deslocamentos registrados em <span id="vktDayLabel">${dateBR(today())}</span></h4><div id="vktDayList"></div></div>
           <div class="vk-live" id="vkLive"></div>
           <button class="btn primary" type="submit" id="vkSave" ${ready ? '' : 'disabled'}>Salvar km do dia</button>
         </form>
@@ -305,6 +342,7 @@
       <div id="vkForecast"></div>
       <div id="vkReport"></div>
       <div class="vh-card"><h3 class="vk-h">Últimos registros</h3><div id="vkLogs"></div></div>
+      <div class="vh-card"><h3 class="vk-h">Relatório de trajetos</h3><p class="muted">Os trajetos opcionais registrados junto com os km diários aparecem aqui.</p><div id="vkTripsReport"></div></div>
 
       <details class="vh-card vk-quick"><summary><b>Calculadora rápida</b> <small class="muted">— quanto gastei desde o último abastecimento</small></summary>
         <div class="vh-form"><div class="form-grid">
@@ -329,6 +367,7 @@
     g('vkForecast').innerHTML = forecastHTML(v, p);
     g('vkReport').innerHTML = reportHTML(v, p);
     g('vkLogs').innerHTML = logsHTML(v);
+    const tripBox=g('vkTripsReport'); if(tripBox) tripBox.innerHTML=tripsHTML(v,p);
     quick();
   }
 
@@ -362,6 +401,9 @@
     g('vkEve').value = ex ? ex.evening_odometer : '';
     g('vkKmIn').value = ex ? ex.km_driven : '';
     g('vkNotes').value = (ex && ex.notes) || '';
+    ['vktFromNew','vktToNew','vktOut','vktIn','vktStart','vktEnd','vktKm','vktExtra','vktNote'].forEach(id=>{if(g(id))g(id).value=''});
+    if(g('vktFrom'))g('vktFrom').value=''; if(g('vktTo'))g('vktTo').value='';
+    tripLive(); renderDayTrips(); fillPlaces();
     g('vkSave').textContent = ex ? 'Atualizar km de ' + dateBR(date) : 'Salvar km do dia';
     live();
   }
@@ -379,6 +421,15 @@
       ${t && full ? tile('Restante no tanque', N(Math.max(0, rem), 1) + ' L', rem > 0 ? '≈ ' + N(rem * c, 0) + ' km de autonomia' : 'Provavelmente na reserva') : ''}
       ${t ? tile('Encher do zero', R(t * p), N(t, 1) + ' L × ' + R(p)) : ''}
     </div>${t && full ? `<div class="ab-bar ${lv < 15 ? 'hot' : ''}" style="height:14px"><i style="width:${lv}%"></i></div><small class="muted">Nível estimado do tanque: ${N(lv, 0)}%${l > t ? ' — passou da capacidade do tanque, confira os km e o consumo.' : ''}${lv < 15 ? ' ⛽ Hora de abastecer!' : ''}</small>` : ''}`;
+  }
+
+  function tripLive() {
+    const el = g('vktPreview'); if (!el) return;
+    const a=g('vktStart').value,b=g('vktEnd').value,k=g('vktKm').value;
+    if(a!==''&&b!==''&&Number(b)<Number(a)){el.innerHTML='<span class="negative">O KM final do trecho não pode ser menor que o inicial.</span>';return;}
+    const dist=(a!==''&&b!=='')?Number(b)-Number(a):(k!==''?Number(k):null);
+    const p=params(vehicle()),c=dist!==null?cost(dist,p):null,extra=Number(g('vktExtra').value||0);
+    el.innerHTML=`${dist!==null?`<b>${N(dist,1)} km</b>${c!==null?` · combustível estimado ${R(c)}`:''}`:'Distância do trecho não informada'}${extra?` · extra ${R(extra)}`:''}`;
   }
 
   async function save(e) {
@@ -402,7 +453,76 @@
     const r = await sb.from('vehicle_daily_km').upsert(payload, { onConflict: 'user_id,vehicle_id,log_date' });
     if (r.error) return toast('Não foi possível salvar a quilometragem. ' + r.error.message);
     toast(`Km do dia salvo: ${N(n - m, 1)} km rodados.`);
-    await loadData(); renderPage();
+    await loadData();
+    if (VH.trips().some(t => t.vehicle_id === v.id && t.trip_date === date)) {
+      await syncDailyFromTrips(v.id, date);
+      await loadData();
+    }
+    renderPage();
+  }
+
+  function places(){return VH.locations().map(x=>x.name)}
+  function fillPlaces(){['vktFrom','vktTo'].forEach(id=>{const el=g(id);if(!el)return;const val=el.value;el.innerHTML='<option value="">Selecionar local (opcional)</option>'+places().map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');el.value=val})}
+  function renderDayTrips(){
+    const box=g('vktDayList');if(!box)return;
+    const date=g('vkDate').value||today(),v=vehicle(),p=params(v);
+    const rows=VH.trips().filter(t=>t.vehicle_id===v.id&&t.trip_date===date).sort((a,b)=>(a.departure_time||'').localeCompare(b.departure_time||''));
+    const kmOf=t=>t.km_driven!=null?Number(t.km_driven):(t.start_odometer!=null&&t.end_odometer!=null?Math.max(0,Number(t.end_odometer)-Number(t.start_odometer)):0);
+    if(g('vktDayLabel'))g('vktDayLabel').textContent=dateBR(date);
+    if(!rows.length){box.innerHTML='<p class="muted">Nenhum trecho adicionado neste dia.</p>';return}
+    const total=sumBy(rows,kmOf),spent=sumBy(rows,t=>(cost(kmOf(t),p)||0)+Number(t.extra_cost||0));
+    const lastWithEnd=[...rows].reverse().find(t=>t.end_odometer!=null),firstWithStart=rows.find(t=>t.start_odometer!=null);
+    box.innerHTML=`<div class="vh-calc"><div class="vh-tile"><small>Trechos</small><b>${rows.length}</b></div><div class="vh-tile"><small>KM dos trechos</small><b>${KM(total)}</b></div><div class="vh-tile"><small>Gasto estimado</small><b>${R(spent)}</b></div><div class="vh-tile"><small>Odômetro inicial</small><b>${firstWithStart?N(firstWithStart.start_odometer,1)+' km':'—'}</b></div><div class="vh-tile"><small>KM final do dia</small><b>${lastWithEnd?N(lastWithEnd.end_odometer,1)+' km':'—'}</b></div></div><div class="table-wrap"><table><thead><tr><th>Horário</th><th>Trajeto</th><th>KM</th><th>KM final</th><th>Custo</th><th>Ações</th></tr></thead><tbody>${rows.map(t=>`<tr><td>${t.departure_time||'—'}${t.arrival_time?' – '+t.arrival_time:''}</td><td>${esc(t.origin||'—')} → ${esc(t.destination||'—')}</td><td>${kmOf(t)?KM(kmOf(t)):'—'}</td><td>${t.end_odometer!=null?N(t.end_odometer,1)+' km':'—'}</td><td>${R((cost(kmOf(t),p)||0)+Number(t.extra_cost||0))}</td><td><button class="mini-btn" data-vkt-edit="${t.id}">Editar</button> <button class="mini-btn danger" data-vkt-del="${t.id}">Excluir</button></td></tr>`).join('')}</tbody></table></div>`;
+  }
+  function clearTripEditor(){
+    editingTripId=null;
+    ['vktFromNew','vktToNew','vktOut','vktIn','vktStart','vktEnd','vktKm','vktExtra','vktNote'].forEach(id=>{if(g(id))g(id).value=''});
+    if(g('vktFrom'))g('vktFrom').value='';if(g('vktTo'))g('vktTo').value='';
+    if(g('vktAdd'))g('vktAdd').textContent='Adicionar deslocamento ao dia';
+    if(g('vktCancelEdit'))g('vktCancelEdit').classList.add('hidden');
+    tripLive();
+  }
+  function editTrip(id){
+    const t=VH.trips().find(x=>String(x.id)===String(id));if(!t)return;
+    g('vkDate').value=t.trip_date||today();fillForm();
+    editingTripId=t.id;fillPlaces();
+    g('vktFrom').value=t.origin||'';g('vktTo').value=t.destination||'';
+    g('vktFromNew').value='';g('vktToNew').value='';
+    g('vktOut').value=t.departure_time||'';g('vktIn').value=t.arrival_time||'';
+    g('vktStart').value=t.start_odometer??'';g('vktEnd').value=t.end_odometer??'';
+    g('vktKm').value=t.km_driven??'';g('vktExtra').value=t.extra_cost??'';
+    g('vktNote').value=t.notes||'';
+    g('vktAdd').textContent='Salvar alterações do deslocamento';
+    g('vktCancelEdit').classList.remove('hidden');
+    g('vktAdd').scrollIntoView({behavior:'smooth',block:'center'});tripLive();
+  }
+  async function syncDailyFromTrips(vehicleId,date){
+    const rows=VH.trips().filter(t=>t.vehicle_id===vehicleId&&t.trip_date===date).sort((a,b)=>(a.departure_time||'').localeCompare(b.departure_time||''));
+    if(!rows.length)return;
+    const first=rows.find(t=>t.start_odometer!=null),last=[...rows].reverse().find(t=>t.end_odometer!=null);
+    const known=rows.every(t=>t.km_driven!=null||(t.start_odometer!=null&&t.end_odometer!=null));
+    const total=sumBy(rows,t=>t.km_driven!=null?Number(t.km_driven):Math.max(0,Number(t.end_odometer||0)-Number(t.start_odometer||0)));
+    if(!last&&!known)return;
+    const existing=VH.dailyKm().find(x=>x.vehicle_id===vehicleId&&x.log_date===date);
+    const morning=first?Number(first.start_odometer):(existing?Number(existing.morning_odometer):odoBefore(vehicle(),date));
+    const evening=last?Number(last.end_odometer):(morning!=null?Number(morning)+total:null);
+    const payload={user_id:user.id,vehicle_id:vehicleId,log_date:date,morning_odometer:morning??0,evening_odometer:evening??total,km_driven:known?total:(evening!=null&&morning!=null?Math.max(0,evening-morning):total),notes:existing?.notes||null};
+    const r=await sb.from('vehicle_daily_km').upsert(payload,{onConflict:'user_id,vehicle_id,log_date'});
+    if(r.error)console.warn('Não foi possível atualizar o resumo diário pelos trechos:',r.error.message);
+  }
+  async function addTrip(){
+    if(!VH.tripsReady())return toast('Execute ATUALIZACAO-TRAJETOS-VEICULOS.sql no Supabase.');
+    const v=vehicle(),date=g('vkDate').value||today(),a=g('vktStart').value,b=g('vktEnd').value,k=g('vktKm').value;
+    if(a!==''&&b!==''&&Number(b)<Number(a))return toast('O KM final não pode ser menor que o inicial.');
+    const dist=a!==''&&b!==''?Number(b)-Number(a):(k!==''?Number(k):null);
+    const from=(g('vktFromNew').value.trim()||g('vktFrom').value||'').trim(),to=(g('vktToNew').value.trim()||g('vktTo').value||'').trim();
+    const row={user_id:user.id,vehicle_id:v.id,trip_date:date,origin:from||null,destination:to||null,departure_time:g('vktOut').value||null,arrival_time:g('vktIn').value||null,start_odometer:a===''?null:Number(a),end_odometer:b===''?null:Number(b),km_driven:dist,extra_cost:Number(g('vktExtra').value||0),notes:g('vktNote').value.trim()||null};
+    if(!Object.entries(row).some(([key,val])=>!['user_id','vehicle_id','trip_date'].includes(key)&&val!==null&&val!==0&&val!==''))return toast('Preencha ao menos uma informação do deslocamento.');
+    const wasEdit=!!editingTripId;
+    const r=wasEdit?await sb.from('vehicle_trips').update(row).eq('id',editingTripId).eq('user_id',user.id):await sb.from('vehicle_trips').insert(row);
+    if(r.error)return toast('Erro ao salvar deslocamento: '+r.error.message);
+    if(g('vktSavePlaces').checked){for(const name of [from,to].filter(Boolean)){if(!places().some(x=>x.toLowerCase()===name.toLowerCase())){const lr=await sb.from('vehicle_locations').insert({user_id:user.id,name});if(lr.error&&lr.error.code!=='23505')console.warn('Local não salvo:',lr.error.message)}}}
+    clearTripEditor();await loadData();await syncDailyFromTrips(v.id,date);await loadData();renderPage();toast(wasEdit?'Deslocamento atualizado.':'Deslocamento adicionado ao dia.');
   }
 
   function bind() {
@@ -420,9 +540,13 @@
     [['vkKml', 'kml'], ['vkPrice', 'price'], ['vkTank', 'tank'], ['vkRes', 'reserve']].forEach(([id, k]) => { g(id).oninput = () => setOv(k, g(id)); });
     g('vkReset').onclick = () => { delete P[vehicle().id]; write(PK, P); fillParams(); live(); refresh(); };
 
-    g('vkDate').onchange = fillForm;
+    g('vkDate').onchange = () => { clearTripEditor(); fillForm(); };
     ['vkMorn', 'vkEve', 'vkKmIn'].forEach(id => { g(id).oninput = live; });
     g('vkForm').onsubmit = save;
+    ['vktStart','vktEnd','vktKm','vktExtra'].forEach(id=>g(id).oninput=tripLive);
+    ['vktFrom','vktTo','vktFromNew','vktToNew','vktOut','vktIn','vktNote'].forEach(id=>g(id).oninput=tripLive);
+    g('vktAdd').onclick=addTrip; if(g('vktCancelEdit'))g('vktCancelEdit').onclick=clearTripEditor;
+
     ['qcKm', 'qcP', 'qcC', 'qcT'].forEach(id => { g(id).oninput = quick; });
     g('qcF').onchange = quick;
 
@@ -437,6 +561,8 @@
         live();
       }
       else if (b.dataset.vkEdit) { g('vkDate').value = b.dataset.vkEdit; fillForm(); g('vkForm').scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+      else if (b.dataset.vktEdit) { editTrip(b.dataset.vktEdit); }
+      else if (b.dataset.vktDel) { if(!confirm('Excluir este trajeto?'))return; const t=VH.trips().find(x=>String(x.id)===String(b.dataset.vktDel)); sb.from('vehicle_trips').delete().eq('id',b.dataset.vktDel).then(async r=>{if(r.error)return toast(r.error.message);await loadData();if(t)await syncDailyFromTrips(t.vehicle_id,t.trip_date);await loadData();renderPage()}); }
       else if (b.dataset.vkDel) {
         if (!confirm('Excluir este registro diário?')) return;
         sb.from('vehicle_daily_km').delete().eq('id', b.dataset.vkDel).then(async r => {

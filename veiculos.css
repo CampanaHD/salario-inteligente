@@ -105,3 +105,6 @@ body.compact #pageContent td{padding:6px 10px}body.compact .vh-card,body.compact
 .vk-acts{white-space:nowrap}.vk-acts .mini-btn{margin-left:4px}
 .vk-quick summary{cursor:pointer;font-size:15px}.vk-quick[open] summary{margin-bottom:12px}
 @media(max-width:640px){.vk-week{gap:4px}.vk-col{grid-template-rows:auto 100px auto auto auto}.vk-bar{height:100px}.vk-col b{font-size:10px}.vk-col small{font-size:9px}.vk-dn{font-size:11px}}
+
+/* Registro e relatório de trajetos da calculadora */
+.vk-trips-card{margin-top:16px}.vk-trips-card .form-grid{margin-top:12px}.vk-trips-card .vk-live{margin:10px 0;padding:12px 14px;border-radius:12px;background:var(--surface-2,rgba(120,120,120,.08));color:var(--text-secondary,var(--text));}.vk-trips-card #vkTripsReport{margin-top:20px}.vk-trips-card #vkTripsReport .vh-calc{margin:12px 0}.vk-trips-card table{min-width:760px}.vk-trips-card td small{color:var(--text-secondary,#888)}

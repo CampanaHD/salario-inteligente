@@ -58,3 +58,49 @@ dialog.si-dialog textarea{width:100%;padding:11px;box-sizing:border-box;font-siz
 
 /* pizza */
 .pie{display:flex;gap:18px;align-items:center;flex-wrap:wrap}.pie-svg{width:190px;height:190px;flex:none}.pie-leg{flex:1;min-width:160px}.pie-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px}
+
+
+/* Tema Alfa — inspirado na referência enviada: fundo carvão, verde vivo e painéis escuros */
+html[data-theme="alfa"]{
+  color-scheme:dark;
+  --ink:#edf5f1;--muted:#9aaca5;--teal:#19b653;--teal-dark:#087b39;
+  --mint:#123b28;--bg:#0b1114;--white:#141d22;--line:#29383e;
+  --red:#ff6873;--amber:#f4bd36;--shadow:0 14px 38px #0008;
+  background:#0b1114;color:#edf5f1;
+}
+html[data-theme="alfa"] body{background:#0b1114;color:#edf5f1}
+html[data-theme="alfa"] .sidebar{background:linear-gradient(180deg,#082c1d 0%,#07110e 44%,#080d10 100%);border-color:#1c3028}
+html[data-theme="alfa"] .topbar{background:#11191e;border-color:#26343a}
+html[data-theme="alfa"] .main,html[data-theme="alfa"] .content{background:#0b1114}
+html[data-theme="alfa"] .panel,html[data-theme="alfa"] .card,html[data-theme="alfa"] .vh-card,
+html[data-theme="alfa"] .modal-content,html[data-theme="alfa"] .auth-card,
+html[data-theme="alfa"] .settings-card,html[data-theme="alfa"] .stat-card{
+  background:#111a20!important;color:#edf5f1!important;border-color:#29383e!important;box-shadow:0 12px 30px #0003
+}
+html[data-theme="alfa"] h1,html[data-theme="alfa"] h2,html[data-theme="alfa"] h3,
+html[data-theme="alfa"] h4,html[data-theme="alfa"] strong,html[data-theme="alfa"] b{color:#f2f8f5}
+html[data-theme="alfa"] p,html[data-theme="alfa"] small,html[data-theme="alfa"] label,
+html[data-theme="alfa"] .muted,html[data-theme="alfa"] .eyebrow{color:#a9bbb3}
+html[data-theme="alfa"] input,html[data-theme="alfa"] select,html[data-theme="alfa"] textarea{
+  color:#edf5f1!important;background:#0d1519!important;border-color:#304149!important
+}
+html[data-theme="alfa"] input::placeholder,html[data-theme="alfa"] textarea::placeholder{color:#82958d}
+html[data-theme="alfa"] .btn.primary,html[data-theme="alfa"] .nav-item.active,
+html[data-theme="alfa"] .tab.active{background:#19b653!important;color:#fff!important;border-color:#19b653!important}
+html[data-theme="alfa"] .btn.outline,html[data-theme="alfa"] .btn.ghost,
+html[data-theme="alfa"] .icon-btn,html[data-theme="alfa"] .mini-btn{
+  background:#172329!important;color:#dce9e2!important;border-color:#304149!important
+}
+html[data-theme="alfa"] .table-wrap,html[data-theme="alfa"] table{color:#e8f1ec}
+html[data-theme="alfa"] th{background:#172329!important;color:#b8c9c1!important}
+html[data-theme="alfa"] td{background:#111a20!important;border-color:#29383e!important;color:#e8f1ec!important}
+html[data-theme="alfa"] tr:nth-child(even) td{background:#142027!important}
+html[data-theme="alfa"] .vh-tile,html[data-theme="alfa"] .vk-live,
+html[data-theme="alfa"] .notice,html[data-theme="alfa"] .insight-tile{
+  background:#14251d!important;border-color:#245238!important;color:#e8f5ed!important
+}
+html[data-theme="alfa"] .eyebrow{color:#4ed17d}
+html[data-theme="alfa"] .nav-item{color:#d2e1d8}
+html[data-theme="alfa"] .nav-item:hover{background:#123c27;color:#fff}
+html[data-theme="alfa"] .theme-toggle{background:#19262b!important;color:#f2c94c!important;border-color:#34454b!important}
+html[data-theme="alfa"] .divider,html[data-theme="alfa"] hr{border-color:#29383e}

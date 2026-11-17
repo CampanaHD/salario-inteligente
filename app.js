@@ -188,7 +188,25 @@ async function editVehicle(id){const v=vehicles.find(x=>x.id===id);if(!v)return;
 async function editFuel(id){const r=fuelRecords.find(x=>x.id===id);if(!r)return;const date=prompt('Data (AAAA-MM-DD):',r.fuel_date||today());if(date===null)return;const odometer=prompt('Quilometragem (km):',r.odometer);if(odometer===null)return;const fuel=prompt('Combustível:',r.fuel_name||'Gasolina');if(fuel===null)return;const liters=prompt('Litros:',r.liters);if(liters===null)return;const price=prompt('Preço por litro (R$):',r.price_per_liter);if(price===null)return;const total=prompt('Valor total (R$):',r.total_amount);if(total===null)return;const station=prompt('Posto:',r.station||'');if(station===null)return;const payment=prompt('Forma de pagamento (Pix, Crédito, Débito, Dinheiro, Vale combustível, Outro):',r.payment_method||'Pix');if(payment===null)return;const full=prompt('Tanque cheio? Digite S para sim ou N para não:',r.full_tank?'S':'N');if(full===null)return;const notes=prompt('Observações:',r.notes||'');if(notes===null)return;const {error}=await sb.from('fuel_records').update({fuel_date:date,odometer:Number(odometer),fuel_name:fuel.trim()||'Gasolina',liters:Number(liters),price_per_liter:Number(price),total_amount:Number(total),station:station.trim()||null,payment_method:payment.trim()||'Outro',full_tank:/^s(im)?$/i.test(full.trim()),notes:notes.trim()||null}).eq('id',id);if(error)return toast(error.message);const linked=transactions.filter(t=>String(t.notes||'').includes(`fuel_record_id:${id}`));if(linked.length){const vehicle=vehicles.find(v=>v.id===r.vehicle_id),count=linked.length,base=new Date(date+'T12:00:00');let cents=Math.round(Number(total)*100);for(let i=0;i<linked.length;i++){const d=new Date(base);const day=d.getDate();d.setDate(1);d.setMonth(d.getMonth()+i);d.setDate(Math.min(day,new Date(d.getFullYear(),d.getMonth()+1,0).getDate()));const txDate=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`,part=i===linked.length-1?cents:Math.round(Number(total)*100/count);cents-=part;const tx=await sb.from('transactions').update({description:`Abastecimento — ${vehicle?.name||'Veículo'}${station.trim()?' · '+station.trim():''}${count>1?` (${i+1}/${count})`:''}`,amount:part/100,transaction_date:txDate,category:'Combustível',payment_method:payment.trim()||'Outro',is_paid:i===0,notes:`fuel_record_id:${id}; pagamento:${payment.trim()}; parcela:${i+1}/${count}${notes.trim()?'; '+notes.trim():''}`}).eq('id',linked[i].id);if(tx.error)return toast('Abastecimento atualizado, mas o lançamento financeiro falhou: '+tx.error.message)}}await loadData();renderPage();toast('Abastecimento e lançamento financeiro atualizados.')}
 
 // Tema claro/escuro com preferência persistida neste navegador.
-(function setupTheme(){const apply=mode=>{document.documentElement.dataset.theme=mode;localStorage.setItem('salario-theme',mode);const b=document.getElementById('themeToggle');if(b){b.textContent=mode==='dark'?'☀':'☾';b.title=mode==='dark'?'Ativar modo claro':'Ativar modo escuro';b.setAttribute('aria-label',b.title)}};apply(localStorage.getItem('salario-theme')||'light');document.addEventListener('click',e=>{if(e.target.closest('#themeToggle'))apply(document.documentElement.dataset.theme==='dark'?'light':'dark')})})();
+(function setupTheme(){
+  const modes=['light','dark','alfa'];
+  const labels={light:'Tema claro',dark:'Tema escuro',alfa:'Tema verde (referência Alfa)'};
+  const icons={light:'☾',dark:'☀',alfa:'🟢'};
+  const apply=mode=>{
+    if(!modes.includes(mode))mode='light';
+    document.documentElement.dataset.theme=mode;
+    localStorage.setItem('salario-theme',mode);
+    const b=document.getElementById('themeToggle');
+    if(b){b.textContent=icons[mode];b.title='Tema atual: '+labels[mode]+' — clique para alternar';b.setAttribute('aria-label',b.title)}
+  };
+  apply(localStorage.getItem('salario-theme')||'light');
+  document.addEventListener('click',e=>{
+    if(e.target.closest('#themeToggle')){
+      const current=document.documentElement.dataset.theme||'light';
+      apply(modes[(modes.indexOf(current)+1)%modes.length]);
+    }
+  });
+})();
 
 /* ===== Abastecimento PRO: filtros, KPIs, gráficos e comparações ===== */
 const fz={veh:'all',fuel:'all',st:'all',per:'90'};

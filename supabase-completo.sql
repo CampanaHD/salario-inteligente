@@ -175,3 +175,18 @@ alter table public.vehicle_daily_km enable row level security;
 drop policy if exists "vehicle_daily_km_own" on public.vehicle_daily_km;
 create policy "vehicle_daily_km_own" on public.vehicle_daily_km for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 create index if not exists vehicle_daily_km_vehicle_date_idx on public.vehicle_daily_km(vehicle_id, log_date desc);
+
+-- Permite o tipo 'transfer' em lançamentos (usado no histórico do pagamento de fatura do cartão).
+-- Pode ser executado mais de uma vez com segurança.
+do $$
+declare c text;
+begin
+  for c in
+    select conname from pg_constraint
+    where conrelid = 'public.transactions'::regclass and contype = 'c'
+      and pg_get_constraintdef(oid) ilike '%kind%income%'
+  loop
+    execute format('alter table public.transactions drop constraint %I', c);
+  end loop;
+  alter table public.transactions add constraint transactions_kind_check check (kind in ('income','expense','transfer'));
+end $$;
