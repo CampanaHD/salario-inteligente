@@ -65,3 +65,43 @@ body.compact #pageContent td{padding:6px 10px}body.compact .vh-card,body.compact
 /* calculadora e planejamento */
 .vh-calc{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:14px 0}
 .vh-tile{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px;display:grid;gap:4px}.vh-tile small{color:var(--muted);font-size:12px}.vh-tile b{font-size:22px}.vh-tile span{font-size:12px;color:var(--muted)}
+
+/* ===== Veículos: pagamento, vínculo com Lançamentos e calculadora ===== */
+.vk-pay{border:1px solid var(--line);border-radius:14px;padding:12px 14px 6px;margin:6px 0 4px;min-width:0}
+.vk-pay legend{padding:0 8px;font-size:12px;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:.05em}
+.vk-pay .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:0 12px}
+.vk-pay small{display:block;margin:0 0 8px}
+.vk-link{grid-column:1/-1;margin-top:12px}
+#transactionDialog.vk-on #dvSwitchWrap{display:none!important}
+.vk .vh-card{margin-bottom:16px}
+.vk-h{margin:0 0 4px;font-size:17px}.vk-sub{margin:0 0 12px;font-size:13px}
+.vk-filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:10px}
+.vk-filters label{display:grid;gap:5px;font-size:12px;color:var(--muted);font-weight:600;margin:0}
+.vk-zero{align-items:flex-start;font-weight:500;margin:4px 0 8px}.vk-zero small{display:block}
+.vk-det{margin-top:8px}.vk-det summary{cursor:pointer;font-weight:700;font-size:14px;color:var(--teal);padding:6px 0}
+.vk-params .form-grid{margin-top:10px}
+.vk-seg{display:flex;gap:4px;padding:4px;background:var(--bg);border:1px solid var(--line);border-radius:14px;margin:10px 0 14px;width:fit-content;max-width:100%;flex-wrap:wrap}
+.vk-seg button{border:0;background:transparent;color:var(--muted);padding:8px 14px;border-radius:10px;font-weight:700;font-size:13px}
+.vk-seg button.on{background:var(--teal);color:#fff}
+.vk-live{min-height:22px;margin:2px 0 12px;font-size:14px}
+.vk-big{display:grid;gap:2px;margin:6px 0 4px}.vk-big b{font-size:clamp(24px,5vw,34px);letter-spacing:-.5px;color:var(--teal)}.vk-big span{color:var(--muted);font-weight:600}
+.vk-tank{position:relative;height:16px;border-radius:99px;background:var(--line);overflow:hidden;margin:8px 0 6px}
+.vk-tank i{display:block;height:100%;background:linear-gradient(90deg,var(--teal),#5dd8a9);border-radius:99px}.vk-tank i.hot{background:var(--red)}
+.vk-tank s{position:absolute;top:0;bottom:0;width:2px;background:var(--ink);opacity:.55}
+.vk-days{display:grid;grid-template-columns:repeat(auto-fit,minmax(78px,1fr));gap:8px;margin:14px 0 6px}
+.vk-day{display:grid;gap:6px;justify-items:center;padding:10px 6px;border:1px solid var(--line);border-radius:12px;background:var(--bg);text-align:center}
+.vk-day small{font-size:11px;color:var(--muted);font-weight:700}.vk-day b{font-size:12px}
+.vk-day.last{border-color:var(--teal);background:var(--mint)}
+.vk-mini{width:18px;height:46px;border-radius:6px;background:var(--line);display:flex;align-items:flex-end;overflow:hidden}.vk-mini i{display:block;width:100%;background:var(--teal);border-radius:6px 6px 0 0}
+.vk-week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;align-items:end;margin:12px 0 6px}
+.vk-col{display:grid;grid-template-rows:auto 130px auto auto auto;gap:5px;justify-items:center;text-align:center;min-width:0}
+.vk-col b{font-size:12px}.vk-col small{font-size:11px}
+.vk-bar{width:100%;max-width:46px;height:130px;background:var(--bg);border:1px solid var(--line);border-radius:10px 10px 4px 4px;display:flex;align-items:flex-end;overflow:hidden}
+.vk-bar i{display:block;width:100%;background:linear-gradient(180deg,#5dd8a9,var(--teal));border-radius:8px 8px 0 0}
+.vk-col.top .vk-bar i{background:linear-gradient(180deg,#ffb36b,var(--amber))}.vk-col.top b{color:var(--amber)}
+.vk-col.low .vk-bar i{opacity:.55}
+.vk-dn{font-weight:800;font-size:13px}
+.vk-insight{margin:8px 0 12px;padding:12px 14px;border-radius:12px;background:var(--mint);font-size:14px;line-height:1.5}
+.vk-acts{white-space:nowrap}.vk-acts .mini-btn{margin-left:4px}
+.vk-quick summary{cursor:pointer;font-size:15px}.vk-quick[open] summary{margin-bottom:12px}
+@media(max-width:640px){.vk-week{gap:4px}.vk-col{grid-template-rows:auto 100px auto auto auto}.vk-bar{height:100px}.vk-col b{font-size:10px}.vk-col small{font-size:9px}.vk-dn{font-size:11px}}
