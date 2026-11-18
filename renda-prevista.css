@@ -1,0 +1,8 @@
+/* Complementos visuais da previsão de renda */
+#pageContent .forecast-grid{align-items:stretch}
+#pageContent .forecast-line{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--line);font-size:13px}
+#pageContent .forecast-line:last-of-type{border-bottom:0}
+#pageContent .forecast-line span{color:var(--muted)}
+#pageContent .forecast-net{letter-spacing:-.03em}
+#pageContent #rpIncomeForm{padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--surface,transparent)}
+#pageContent #rpScenario{align-items:stretch}
