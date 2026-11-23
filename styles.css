@@ -363,3 +363,10 @@ html,body{max-width:100%;overflow-x:hidden}img,svg,canvas{max-width:100%}
 .category-preset small{color:var(--muted);font-size:12px}
 .category-settings .divider{height:1px;background:var(--line);margin:20px 0}
 .category-settings h3{margin:8px 0 12px}
+/* Resumo dinâmico de dívidas/financiamentos no cadastro */
+.bill-calc-preview{padding:14px;border:1px solid var(--border,#293241);border-radius:14px;background:var(--surface-soft,rgba(90,120,140,.08));display:block}
+.bill-calc-preview.hidden{display:none!important}
+.bill-calc-values{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:12px 0}
+.bill-calc-values span{display:flex;flex-direction:column;gap:5px;font-size:.82rem;color:var(--muted,#8b98a8)}
+.bill-calc-values strong{font-size:1rem;color:var(--text,#f1f4f8)}
+@media(max-width:600px){.bill-calc-values{grid-template-columns:1fr}}

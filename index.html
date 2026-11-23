@@ -17,6 +17,7 @@
   <link rel="stylesheet" href="financas.css">
   <link rel="stylesheet" href="renda-prevista.css">
   <link rel="stylesheet" href="acabamento.css?v=1">
+  <link rel="stylesheet" href="personalizacao.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -131,14 +132,18 @@
       <div class="form-grid">
         <label>Nome da conta<input id="billName" required placeholder="Ex.: Internet"></label>
         <label>Categoria<select id="billCategory"><option>Moradia</option><option>Contas</option><option>Transporte</option><option>Saúde</option><option>Educação</option><option>Cartão</option><option>Outros</option></select></label>
-        <label>Valor (R$)<input id="billAmount" required type="number" min="0.01" step="0.01"></label>
+        <label id="billAmountWrap">Valor da parcela (R$)<input id="billAmount" required type="number" min="0.01" step="0.01"></label>
         <label>Próximo vencimento<input id="billDue" required type="date"></label>
         <label>Repetição<select id="billFrequency"><option value="monthly">Mensal</option><option value="weekly">Semanal</option><option value="once">Não repetir</option><option value="yearly">Anual</option></select></label>
-        <label>Tipo<select id="billType"><option value="bill">Conta recorrente</option><option value="installment">Parcela</option><option value="financing">Financiamento (imóvel/outro)</option><option value="property_tax">IPTU</option></select></label>
+        <label>Tipo<select id="billType"><option value="bill">Conta recorrente</option><option value="installment">Parcela</option><option value="financing">Financiamento</option><option value="loan">Empréstimo / renegociação</option><option value="property_tax">IPTU</option></select></label>
         <label id="billPropertyWrap">Imóvel / endereço<input id="billProperty" placeholder="Ex.: Apartamento — endereço"></label>
-        <label id="billTotalWrap">Valor total do contrato (R$)<input id="billTotal" type="number" min="0" step="0.01"></label>
+        <label id="billTotalWrap">Total a pagar calculado (R$)<input id="billTotal" type="number" min="0" step="0.01" readonly></label>
         <label id="billPartsWrap">Total de parcelas<input id="billParts" type="number" min="1" step="1"></label>
         <label id="billPaidWrap">Parcelas já pagas<input id="billPartsPaid" type="number" min="0" step="1" value="0"></label>
+        <label id="billCreditorWrap">Banco / credor (opcional)<input id="billCreditor" placeholder="Ex.: Bradesco"></label>
+        <label id="billInterestWrap">Juros ao mês (%)<input id="billInterest" type="number" min="0" step="0.01" placeholder="Ex.: 2,5"></label>
+        <label id="billPrincipalWrap">Valor recebido / valor do bem / dívida original (R$)<input id="billPrincipal" type="number" min="0" step="0.01" placeholder="Ex.: 20.000 (opcional)"></label>
+        <div id="billCalcPreview" class="bill-calc-preview hidden" style="grid-column:1/-1"><b>Resumo calculado</b><div class="bill-calc-values"><span>Total das parcelas<strong id="billCalcTotal">R$ 0,00</strong></span><span>Diferença estimada<strong id="billCalcInterest">R$ 0,00</strong></span><span>Parcelas restantes<strong id="billCalcRemaining">0</strong></span></div><small class="muted">A taxa de juros é opcional. A diferença é estimada a partir do valor principal e das parcelas.</small></div>
         <label class="checkline"><input id="billActive" type="checkbox" checked> Ativa</label>
         <label class="checkline family-share-option"><input id="billShareFamily" type="checkbox"> Compartilhar esta conta com a família</label>
       </div>
@@ -180,5 +185,7 @@
   <script src="financas.js"></script>
   <script src="veiculos-lancamento.js"></script>
   <script src="renda-prevista.js"></script>
+  <script src="personalizacao.js"></script>
+  <script src="UX-responsiva.js"></script>
 </body>
 </html>

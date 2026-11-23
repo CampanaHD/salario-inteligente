@@ -1,0 +1,92 @@
+
+/* Personalização de navegação e recebimentos rápidos */
+.quick-income-bar{margin-bottom:16px}.quick-income-buttons{display:flex;gap:10px;flex-wrap:wrap}.quick-income-buttons button{display:flex;flex-direction:column;align-items:flex-start;gap:4px}.quick-income-buttons small{font-size:.78em;opacity:.8}.nav-custom-list{display:grid;gap:7px;margin:14px 0}.nav-custom-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border,#333);border-radius:10px;cursor:grab}.nav-custom-row.dragging{opacity:.5}.nav-drag{opacity:.6;font-size:1.2em}.nav-visibility{margin-left:auto;font-size:.85em;display:flex;align-items:center;gap:6px}.nav-user-hidden{display:none!important}
+#appView.nav-right{flex-direction:row-reverse}#appView.nav-top,#appView.nav-bottom{flex-direction:column}#appView.nav-top .sidebar,#appView.nav-bottom .sidebar{width:100%;min-width:0;max-width:none;flex-direction:row;align-items:center;overflow-x:auto}#appView.nav-top .side-brand,#appView.nav-bottom .side-brand{flex-shrink:0}#appView.nav-top #mainNav,#appView.nav-bottom #mainNav{display:flex;flex-direction:row;align-items:center;gap:6px;overflow-x:auto;flex:1}#appView.nav-top #mainNav .nav-section,#appView.nav-bottom #mainNav .nav-section{display:flex;align-items:center;gap:6px;flex-shrink:0}#appView.nav-top #mainNav .nav-section summary,#appView.nav-bottom #mainNav .nav-section summary{display:none}#appView.nav-top #mainNav .nav-item,#appView.nav-bottom #mainNav .nav-item{white-space:nowrap}#appView.nav-top .side-bottom,#appView.nav-bottom .side-bottom{display:none}#appView.nav-bottom .sidebar{order:2}#appView.nav-bottom .main{order:1}
+@media(max-width:800px){#appView.nav-right{flex-direction:column}#appView.nav-top .sidebar,#appView.nav-bottom .sidebar{display:block}#appView.nav-top #mainNav,#appView.nav-bottom #mainNav{display:block}}
+/* Reforço da navegação configurável e alças de arraste */
+#navCustomizer .nav-custom-row{display:flex;align-items:center;gap:10px;min-height:48px}
+#navCustomizer .nav-drag{cursor:grab;touch-action:none;user-select:none;border:0;background:transparent;padding:8px;font-size:1.35rem;opacity:.8}
+#navCustomizer .nav-drag:active{cursor:grabbing}
+#navCustomizer .nav-custom-label{flex:1}
+#navCustomizer .nav-custom-row:has(.nav-drag:active){opacity:.85}
+
+/* Navegação superior em barra compacta, inspirada no layout de referência */
+#appView.nav-top .sidebar{position:sticky;top:0;left:0;right:0;inset:auto;width:100%;height:58px;min-height:58px;max-width:none;flex-direction:row;align-items:center;gap:12px;padding:6px 14px;margin:0;border-right:0;border-bottom:1px solid var(--line);overflow:hidden;box-shadow:0 3px 12px #00000008;z-index:100;}
+#appView.nav-top .side-brand{margin:0;flex:0 0 auto;gap:8px;}
+#appView.nav-top .side-brand .brand-icon{width:34px;height:34px;border-radius:10px;font-size:20px;}
+#appView.nav-top #mainNav{display:flex;flex-direction:row;align-items:center;gap:3px;flex:1;min-width:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;}
+#appView.nav-top #mainNav .nav-section{display:contents;}
+#appView.nav-top #mainNav .nav-section summary{display:none!important;}
+#appView.nav-top #mainNav .nav-item{display:flex!important;flex:0 0 auto;width:auto;white-space:nowrap;padding:9px 10px;border-radius:8px;font-size:14px;gap:7px;}
+#appView.nav-top #mainNav .nav-item span{white-space:nowrap;font-size:12px;}
+#appView.nav-top .mobile-primary-nav{display:contents;}
+#appView.nav-top .mobile-more-toggle,#appView.nav-top .mobile-more-panel{display:none!important;}
+#appView.nav-top .side-bottom{display:none!important;}
+#appView.nav-top .main{margin-left:0;padding-top:20px;}
+@media(max-width:800px){
+ #appView.nav-top .sidebar{display:flex!important;position:sticky;top:0;height:56px;min-height:56px;width:100%;padding:5px 8px;overflow:hidden;}
+ #appView.nav-top #mainNav{display:flex!important;overflow-x:auto!important;}
+ #appView.nav-top #mainNav .nav-section{display:contents!important;}
+ #appView.nav-top #mainNav .nav-item{display:flex!important;max-width:none;min-width:0;flex:0 0 auto;padding:8px 9px;}
+ #appView.nav-top #mainNav .nav-item span{font-size:11px;}
+ #appView.nav-top .main{margin:0;padding:14px 12px 90px;}
+}
+
+/* Responsividade reforçada para navegação configurável (topo e rodapé) */
+#appView.nav-top, #appView.nav-bottom { min-height:100dvh; min-width:0; }
+#appView.nav-top .sidebar { box-sizing:border-box; }
+#appView.nav-top #mainNav, #appView.nav-bottom #mainNav { min-width:0; max-width:100%; overscroll-behavior-x:contain; -webkit-overflow-scrolling:touch; }
+#appView.nav-top #mainNav .nav-item, #appView.nav-bottom #mainNav .nav-item { min-width:max-content; }
+#appView.nav-bottom .sidebar { position:fixed!important; inset:auto 0 0 0!important; width:100%!important; max-width:none!important; height:auto!important; min-height:64px!important; box-sizing:border-box; padding:6px 8px max(6px,env(safe-area-inset-bottom))!important; border-top:1px solid var(--line); border-right:0!important; overflow:hidden!important; z-index:1000; background:var(--white, var(--bg))!important; }
+#appView.nav-bottom #mainNav { display:flex!important; flex-direction:row!important; align-items:stretch!important; width:100%; gap:4px; overflow-x:auto!important; overflow-y:hidden!important; scrollbar-width:none; }
+#appView.nav-bottom #mainNav::-webkit-scrollbar { display:none; }
+#appView.nav-bottom #mainNav .nav-section { display:contents!important; }
+#appView.nav-bottom #mainNav .nav-section summary { display:none!important; }
+#appView.nav-bottom #mainNav .nav-item { display:flex!important; flex:0 0 auto!important; flex-direction:column!important; align-items:center!important; justify-content:center!important; gap:3px!important; padding:7px 10px!important; min-width:62px!important; max-width:110px!important; border-radius:9px!important; text-align:center; }
+#appView.nav-bottom #mainNav .nav-item span { display:block!important; font-size:clamp(9px,2.5vw,11px)!important; line-height:1.15; white-space:nowrap; }
+#appView.nav-bottom .main { order:1!important; margin:0!important; min-width:0; width:100%; padding-bottom:calc(92px + env(safe-area-inset-bottom))!important; }
+@media(max-width:800px){
+ #appView.nav-top .sidebar { position:sticky!important; inset:0 0 auto 0!important; width:100%!important; height:auto!important; min-height:54px!important; max-height:64px; box-sizing:border-box; display:flex!important; flex-direction:row!important; gap:5px!important; padding:5px 6px!important; overflow:hidden!important; }
+ #appView.nav-top .side-brand { display:none!important; }
+ #appView.nav-top #mainNav { display:flex!important; flex:1 1 auto!important; width:100%!important; min-width:0!important; overflow-x:auto!important; overflow-y:hidden!important; gap:3px!important; scrollbar-width:none; }
+ #appView.nav-top #mainNav::-webkit-scrollbar { display:none; }
+ #appView.nav-top #mainNav .nav-section { display:contents!important; }
+ #appView.nav-top #mainNav .nav-item { display:flex!important; flex:0 0 auto!important; min-width:max-content!important; max-width:none!important; flex-direction:row!important; align-items:center!important; gap:6px!important; padding:8px 9px!important; font-size:13px!important; }
+ #appView.nav-top #mainNav .nav-item span { font-size:11px!important; }
+ #appView.nav-top .main { width:100%; min-width:0; margin:0!important; padding:12px 10px calc(20px + env(safe-area-inset-bottom))!important; box-sizing:border-box; }
+ #appView.nav-bottom .sidebar { min-height:58px!important; max-height:76px; padding:4px 5px max(4px,env(safe-area-inset-bottom))!important; }
+ #appView.nav-bottom #mainNav .nav-item { min-width:55px!important; max-width:88px!important; padding:6px 7px!important; }
+ #appView.nav-bottom #mainNav .nav-item span { white-space:normal!important; max-width:76px; overflow-wrap:anywhere; }
+ #appView.nav-bottom .main { padding-left:10px!important; padding-right:10px!important; padding-bottom:calc(88px + env(safe-area-inset-bottom))!important; }
+}
+@media(max-width:420px){
+ #appView.nav-top .sidebar { min-height:50px!important; max-height:56px; }
+ #appView.nav-top #mainNav .nav-item { padding:7px 8px!important; }
+ #appView.nav-bottom #mainNav .nav-item { min-width:49px!important; padding:5px 4px!important; }
+ #appView.nav-bottom #mainNav .nav-item span { font-size:9px!important; }
+}
+/* Revisão de responsividade: links em uma única faixa com overflow lateral */
+/* Navegação horizontal com setas de rolagem e ordenação ativável */
+#appView.nav-top .nav-scroll-tools,#appView.nav-bottom .nav-scroll-tools{display:flex!important;align-items:center;gap:4px;flex:0 0 auto;}
+#appView.nav-left .nav-scroll-tools,#appView.nav-right .nav-scroll-tools,#appView:not(.nav-top):not(.nav-bottom) .nav-scroll-tools{display:none!important;}
+.nav-scroll-tools button{height:32px;min-width:30px;border:1px solid var(--line,#2e3743);border-radius:8px;background:var(--panel,#151c25);color:var(--text,#dce5ef);cursor:pointer;font-weight:700;}
+.nav-scroll-tools .nav-sort-toggle{padding:0 9px;font-size:11px;white-space:nowrap;}
+#appView.nav-sort-mode .nav-scroll-tools .nav-sort-toggle{background:var(--accent,#376de6);color:white;border-color:transparent;}
+#appView.nav-sort-mode #mainNav .nav-item[data-page]{cursor:grab!important;user-select:none;touch-action:pan-x;outline:1px dashed color-mix(in srgb,var(--accent,#4d88ff) 40%,transparent);outline-offset:-2px;}
+#mainNav .nav-item.nav-dragging{opacity:.35!important;cursor:grabbing!important;}
+#appView.nav-top #mainNav,#appView.nav-bottom #mainNav{flex-wrap:nowrap!important;white-space:nowrap!important;scroll-behavior:smooth;}
+#appView.nav-top #mainNav .nav-item,#appView.nav-bottom #mainNav .nav-item{white-space:nowrap!important;overflow:visible!important;flex-wrap:nowrap!important;}
+#appView.nav-top .mobile-primary-nav,#appView.nav-bottom .mobile-primary-nav,#appView.nav-top .mobile-more-panel,#appView.nav-bottom .mobile-more-panel{display:none!important;}
+#appView.nav-top .sidebar{gap:8px!important;}
+#appView.nav-top #mainNav{flex:1 1 0!important;}
+#appView.nav-bottom #mainNav{flex:1 1 auto!important;}
+#appView.nav-bottom #mainNav .nav-item span{white-space:nowrap!important;overflow:visible!important;overflow-wrap:normal!important;max-width:none!important;}
+@media(max-width:800px){
+ #appView.nav-top .nav-scroll-tools,#appView.nav-bottom .nav-scroll-tools{gap:2px!important;}
+ #appView.nav-top .nav-scroll-tools button,#appView.nav-bottom .nav-scroll-tools button{min-width:28px;height:30px;}
+ #appView.nav-top .nav-scroll-tools .nav-sort-toggle,#appView.nav-bottom .nav-scroll-tools .nav-sort-toggle{padding:0 6px;font-size:10px;}
+ #appView.nav-top #mainNav,#appView.nav-bottom #mainNav{scrollbar-width:none!important;}
+ #appView.nav-top #mainNav::-webkit-scrollbar,#appView.nav-bottom #mainNav::-webkit-scrollbar{display:none!important;}
+}
+#appView.nav-bottom .side-brand{display:none!important;}
+#appView.nav-bottom .sidebar{display:flex!important;flex-direction:row!important;align-items:center!important;gap:4px!important;}
